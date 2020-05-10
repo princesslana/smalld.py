@@ -39,10 +39,7 @@ class SmallD:
 
     def on_dispatch(self, t):
         def decorator(f):
-            def call_with_d(data):
-                f(data.d)
-
-            self.on_gateway_payload(op=0, t=t)(call_with_d)
+            self.on_gateway_payload(op=0, t=t)(lambda payload: f(payload.d))
 
         return decorator
 
