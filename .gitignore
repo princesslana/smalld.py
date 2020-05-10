@@ -1,0 +1,6 @@
+.coverage
+.eggs
+.tox
+__pycache__
+smalld.egg-info
+tags
