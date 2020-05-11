@@ -77,7 +77,7 @@ class SmallD:
                 for listener in self.listeners:
                     listener(AttrDict(json.loads(data)))
 
-            time.sleep(secs=5)
+            time.sleep(5)
 
 
 class Gateway:
@@ -117,7 +117,13 @@ class HttpClient:
         r = requests.get(f"{self.base_url}/{path}", headers=self.headers())
         return AttrDict(r.json())
 
-    def post(self, path, data):
-        print(json.dumps(data))
-        r = requests.post(f"{self.base_url}/{path}", json=data, headers=self.headers())
+    def post(self, path, payload="", attachments=None):
+        if attachments:
+            files = [(f"file{idx}", a) for idx, a in enumerate(attachments)]
+            args = {"data": {"payload_json": json.dumps(payload)}, "files": files}
+        else:
+            args = {"json": payload}
+
+        r = requests.post(f"{self.base_url}/{path}", headers=self.headers(), **args)
+
         return AttrDict(r.json())
