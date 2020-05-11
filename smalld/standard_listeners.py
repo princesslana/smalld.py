@@ -46,7 +46,7 @@ class Identify:
 
     def on_invalid_session(self, data):
         self.session_id = None
-        time.sleep(secs=2)
+        time.sleep(2)
         self.identify()
 
     def identify(self):
