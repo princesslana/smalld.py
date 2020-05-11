@@ -22,5 +22,5 @@ To run tests:
 To run examples, ping_bot in this case:
 ```bash
   $ tox -e run -- examples/ping_bot.py
-``
+```
 
