@@ -59,7 +59,9 @@ class SmallD:
         return decorator
 
     def send_gateway_payload(self, data):
-        self.gateway.send(json.dumps(data))
+        payload = json.dumps(data)
+        logger.debug("gateway payload sent: %s", payload)
+        self.gateway.send(payload)
 
     def reconnect(self):
         self.gateway.close()
