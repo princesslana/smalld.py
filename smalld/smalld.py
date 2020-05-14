@@ -116,7 +116,7 @@ class HttpClient:
     def headers(self):
         return {
             "Authorization": f"Bot {self.token}",
-            "User-Agent": f"DiscordBot (http://github.com/princesslana/smalld.py, {__version__})",
+            "User-Agent": f"DiscordBot (https://github.com/princesslana/smalld.py, {__version__})",
         }
 
     def get(self, path):
