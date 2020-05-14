@@ -1,12 +1,15 @@
 import sys
 import time
+from threading import Thread
 
 
 def add_standard_listeners(smalld):
     sequence = SequenceNumber(smalld)
     Identify(smalld, sequence)
+    Heartbeat(smalld, sequence)
 
 
+OP_HEARTBEAT = 1
 OP_IDENTIFY = 2
 OP_INVALID_SESSION = 9
 OP_RESUME = 6
@@ -75,4 +78,32 @@ class Identify:
                     "seq": self.sequence.number,
                 },
             }
+        )
+
+
+class Heartbeat:
+    def __init__(self, smalld, sequence):
+        self.smalld = smalld
+        self.sequence = sequence
+        self.thread = None
+        self.heartbeat_interval = None
+
+        smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
+
+    def on_hello(self, data):
+        self.heartbeat_interval = data.d.heartbeat_interval
+
+        if not self.thread or not self.thread.is_alive():
+            self.thread = Thread(target=self.run_heartbeat_loop)
+            self.thread.start()
+
+    def run_heartbeat_loop(self):
+        if self.heartbeat_interval:
+            time.sleep(self.heartbeat_interval / 1000)
+            self.send_heartbeat()
+            self.run_heartbeat_loop()
+
+    def send_heartbeat(self):
+        self.smalld.send_gateway_payload(
+            {"op": OP_HEARTBEAT, "d": self.sequence.number}
         )
