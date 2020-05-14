@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import time
+from importlib.metadata import version
 
 import requests
 from attrdict import AttrDict
@@ -11,6 +12,9 @@ from websocket import WebSocket
 from .standard_listeners import add_standard_listeners
 
 logger = logging.getLogger("smalld")
+
+
+__version__ = version("smalld")
 
 
 class SmallD:
@@ -112,7 +116,7 @@ class HttpClient:
     def headers(self):
         return {
             "Authorization": f"Bot {self.token}",
-            "User-Agent": "DiscordBot (http://github.com/princesslana/smalld.py, 0.1.0)",
+            "User-Agent": f"DiscordBot (http://github.com/princesslana/smalld.py, {__version__})",
         }
 
     def get(self, path):
