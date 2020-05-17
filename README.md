@@ -1,5 +1,6 @@
 # SmallD.py
 
+![Build](https://github.com/princesslana/smalld.py/workflows/Build/badge.svg?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/64e4ea90f38d177c0c99/maintainability)](https://codeclimate.com/github/princesslana/smalld.py/maintainability)
 
 SmallD aims to be a minmalist client for the Discord API. It aims to let you use the Discord API, without hiding or abstracting it.
