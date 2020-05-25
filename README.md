@@ -15,7 +15,7 @@ The best way is on The Programmer's Hangout on Discord (https://discord.gg/progr
 
 ## Running
 
-Tox is used to setup an manage virtual envs when working on SmallD.py
+Tox is used to setup and manage virtual envs when working on SmallD.py
 
 To run tests:
 ```bash
