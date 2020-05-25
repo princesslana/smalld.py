@@ -27,3 +27,12 @@ To run examples, ping_bot in this case:
   $ tox -e run -- examples/ping_bot.py
 ```
 
+## Contributing
+
+Checkout the issues, and jump right in! If you have questions, go to [The Programmers Hangout](https://discord.gg/programming) and look for Princess Lana (Lana#4231).
+
+* [Tox](https://tox.readthedocs.io/) is used for running tests.
+  * Run `tox -e` to run tests with your installed python version
+  * Run `tox -e fmt` to format the code
+* [Emoji Log](https://github.com/ahmadawais/Emoji-Log) is used for commit messages and pull requests
+
