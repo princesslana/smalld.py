@@ -34,6 +34,9 @@ class SmallD:
 
         self.get = self.http.get
         self.post = self.http.post
+        self.put = self.http.put
+        self.patch = self.http.patch
+        self.delete = self.http.delete
 
     def __getattr__(self, name):
         if name.startswith("on_"):
@@ -122,19 +125,32 @@ class HttpClient:
         }
 
     def get(self, path):
-        r = self.session.get(f"{self.base_url}/{path}")
-        return AttrDict(r.json())
+        return self.send_request("GET", path)
 
     def post(self, path, payload="", attachments=None):
+        return self.send_request("POST", path, payload, attachments)
+
+    def put(self, path, payload=""):
+        return self.send_request("PUT", path, payload)
+
+    def patch(self, path, payload=""):
+        return self.send_request("PATCH", path, payload)
+
+    def delete(self, path):
+        return self.send_request("DELETE", path)
+
+    def send_request(self, method, path, payload="", attachments=None):
         if attachments:
             files = [(f"file{idx}", a) for idx, a in enumerate(attachments)]
             args = {"data": {"payload_json": json.dumps(payload)}, "files": files}
-        else:
+        elif payload:
             args = {"json": payload}
+        else:
+            args = {}
 
-        r = self.session.post(f"{self.base_url}/{path}", **args)
+        r = self.session.request(method, f"{self.base_url}/{path}", **args)
 
-        return AttrDict(r.json())
+        return AttrDict(r.json()) if r.status_code != 204 else AttrDict()
 
     def close(self):
         self.session.close()
