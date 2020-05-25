@@ -112,6 +112,8 @@ class HttpClient:
     def __init__(self, token, base_url):
         self.token = token
         self.base_url = base_url
+        self.session = requests.Session()
+        self.session.headers.update(self.headers())
 
     def headers(self):
         return {
@@ -120,7 +122,7 @@ class HttpClient:
         }
 
     def get(self, path):
-        r = requests.get(f"{self.base_url}/{path}", headers=self.headers())
+        r = self.session.get(f"{self.base_url}/{path}")
         return AttrDict(r.json())
 
     def post(self, path, payload="", attachments=None):
@@ -130,6 +132,9 @@ class HttpClient:
         else:
             args = {"json": payload}
 
-        r = requests.post(f"{self.base_url}/{path}", headers=self.headers(), **args)
+        r = self.session.post(f"{self.base_url}/{path}", **args)
 
         return AttrDict(r.json())
+
+    def close(self):
+        self.session.close()
