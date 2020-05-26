@@ -1,5 +1,8 @@
+from enum import Flag, auto
+from functools import reduce
 import json
 import logging
+import operator
 import os
 import time
 from importlib.metadata import version
@@ -22,6 +25,7 @@ class SmallD:
         self,
         token=os.environ.get("SMALLD_TOKEN"),
         base_url="https://discord.com/api/v6",
+        intents=None,
     ):
         if not token:
             raise ValueError("No bot token provided")
@@ -29,6 +33,8 @@ class SmallD:
         self.token = token
         self.base_url = base_url
         self.listeners = []
+
+        self.intents = intents if intents is not None else Intent.all() 
 
         self.http = HttpClient(token, base_url)
 
@@ -87,6 +93,29 @@ class SmallD:
                     listener(AttrDict(json.loads(data)))
 
             time.sleep(5)
+
+
+class Intent(Flag):
+    # Gateway intents https://discord.com/developers/docs/topics/gateway#gateway-intents
+    GUILDS = auto()
+    GUILD_MEMBERS = auto()
+    GUILD_BANS = auto()
+    GUILD_EMOJIS = auto()
+    GUILD_INTEGRATIONS = auto()
+    GUILD_WEBHOOKS = auto()
+    GUILD_INVITES = auto()
+    GUILD_VOICE_STATES = auto()
+    GUILD_PRESENCES = auto()
+    GUILD_MESSAGES = auto()
+    GUILD_MESSAGE_REACTIONS = auto()
+    GUILD_MESSAGE_TYPING = auto()
+    DIRECT_MESSAGES = auto()
+    DIRECT_MESSAGE_REACTIONS = auto()
+    DIRECT_MESSAGE_TYPING = auto()
+
+    @staticmethod
+    def all():
+        return reduce(operator.ior, Intent.__members__.values())
 
 
 class Gateway:
