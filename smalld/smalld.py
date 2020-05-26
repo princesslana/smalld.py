@@ -1,4 +1,4 @@
-from enum import Flag, auto
+from enum import Flag
 from functools import reduce
 import json
 import logging
