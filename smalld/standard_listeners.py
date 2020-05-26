@@ -64,6 +64,7 @@ class Identify:
                         "$device": "smalld.py",
                     },
                     "compress": False,
+                    "intents": self.smalld.intents.value
                 },
             }
         )

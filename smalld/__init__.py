@@ -1,1 +1,1 @@
-from .smalld import SmallD, __version__  # noqa
+from .smalld import SmallD, Intent, __version__  # noqa
