@@ -12,7 +12,7 @@ setup(
     install_requires=[
         "attrdict>=2.0.1",
         "requests>=2.23.0",
-        "websocket_client>=0.57.0",
+        "websocket-client>=0.57.0",
     ],
     tests_require=test_deps,
     extras_require=extras,
