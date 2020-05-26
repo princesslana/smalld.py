@@ -2,8 +2,6 @@ import json
 import logging
 import os
 import time
-from importlib.metadata import version
-
 import requests
 from attrdict import AttrDict
 
@@ -11,10 +9,20 @@ from websocket import WebSocket
 
 from .standard_listeners import add_standard_listeners
 
+
+try:
+    from importlib.metadata import version
+    __version__ = version("smalld")
+except ImportError:
+    from pkg_resources import get_distribution
+    __version__ = get_distribution("smalld").version
+
+
+
 logger = logging.getLogger("smalld")
 
 
-__version__ = version("smalld")
+
 
 
 class SmallD:
