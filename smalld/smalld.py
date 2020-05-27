@@ -5,7 +5,7 @@ import logging
 import operator
 import os
 import time
-from importlib.metadata import version
+from pkg_resources import get_distribution
 
 import requests
 from attrdict import AttrDict
@@ -17,7 +17,7 @@ from .standard_listeners import add_standard_listeners
 logger = logging.getLogger("smalld")
 
 
-__version__ = version("smalld")
+__version__ = get_distribution("smalld").version
 
 
 class Intent(Flag):
