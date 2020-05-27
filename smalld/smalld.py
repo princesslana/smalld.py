@@ -124,7 +124,7 @@ class SmallD:
                     for listener in self.listeners:
                         listener(data)
             except GatewayClosedException as e:
-                if e.code in self.recoverable_error_codes:
+                if e.code in recoverable_error_codes:
                     logger.error(f"gateway closed: {e}")
                     self.reconnect()
                 else:
