@@ -42,6 +42,16 @@ class Intent(Flag):
         return reduce(operator.ior, Intent.__members__.values())
 
 
+recoverable_error_codes = {
+    4000,  # unknown error
+    4001,  # unknown opcode
+    4002,  # decode error
+    4005,  # already authenticated
+    4007,  # invalid sequence
+    4009,  # session timed out
+}
+
+
 class SmallD:
     def __init__(
         self,
@@ -108,15 +118,32 @@ class SmallD:
 
             self.gateway = Gateway(gateway_url)
 
-            for data in self.gateway:
-                logger.debug("gateway payload received: %s", data)
-                for listener in self.listeners:
-                    listener(AttrDict(json.loads(data)))
+            try:
+                for data in self.gateway:
+                    logger.debug("gateway payload received: %s", data)
+                    for listener in self.listeners:
+                        listener(data)
+            except GatewayClosedException as e:
+                if e.code in self.recoverable_error_codes:
+                    logger.error(f"gateway closed: {e}")
+                    self.reconnect()
+                else:
+                    raise
 
             time.sleep(5)
 
 
+class GatewayClosedException(Exception):
+    def __init__(self, code, reason):
+        super().__init__(f"{code}: {reason}")
+        self.code = code
+        self.reason = reason
+
+
 class Gateway:
+    FRAME_OPCODE_TEXT = 0x1
+    FRAME_OPCODE_CLOSE = 0x8
+
     def __init__(self, url):
         self.url = url
         self.ws = WebSocket()
@@ -124,9 +151,22 @@ class Gateway:
     def __iter__(self):
         self.ws.connect(self.url)
 
-        for data in self.ws:
-            if data:
-                yield data
+        while True:
+            try:
+                with self.ws.readlock:
+                    opcode, data = self.ws.recv_data()
+            except ConnectionResetError:
+                break
+
+            if not data:
+                continue
+            elif opcode == Gateway.FRAME_OPCODE_TEXT:
+                decoded_data = data.decode("utf-8")
+                yield AttrDict(json.loads(decoded_data))
+            elif opcode == Gateway.FRAME_OPCODE_CLOSE:
+                code = int.from_bytes(data[:2], 'big')
+                reason = data[2:].decode('utf-8')
+                raise GatewayClosedException(code, reason)
 
             if not self.ws.connected:
                 break
