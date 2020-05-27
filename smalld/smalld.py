@@ -10,7 +10,7 @@ from pkg_resources import get_distribution
 import requests
 from attrdict import AttrDict
 
-from websocket import WebSocket
+from websocket import WebSocket, ABNF
 
 from .standard_listeners import add_standard_listeners
 
@@ -140,9 +140,6 @@ class GatewayClosedException(Exception):
 
 
 class Gateway:
-    FRAME_OPCODE_TEXT = 0x1
-    FRAME_OPCODE_CLOSE = 0x8
-
     def __init__(self, url):
         self.url = url
         self.ws = WebSocket()
@@ -159,10 +156,10 @@ class Gateway:
 
             if not data:
                 continue
-            elif opcode == Gateway.FRAME_OPCODE_TEXT:
+            elif opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
-            elif opcode == Gateway.FRAME_OPCODE_CLOSE:
+            elif opcode == ABNF.OPCODE_CLOSE:
                 code = int.from_bytes(data[:2], 'big')
                 reason = data[2:].decode('utf-8')
                 raise GatewayClosedException(code, reason)
