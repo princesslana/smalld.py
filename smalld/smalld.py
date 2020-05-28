@@ -10,7 +10,7 @@ from pkg_resources import get_distribution
 
 import requests
 from attrdict import AttrDict
-from websocket import WebSocket
+from websocket import ABNF, WebSocket
 
 from .standard_listeners import add_standard_listeners
 
@@ -40,6 +40,16 @@ class Intent(Flag):
     @staticmethod
     def all():
         return reduce(operator.ior, Intent.__members__.values())
+
+
+recoverable_error_codes = {
+    4000,  # unknown error
+    4001,  # unknown opcode
+    4002,  # decode error
+    4005,  # already authenticated
+    4007,  # invalid sequence
+    4009,  # session timed out
+}
 
 
 class SmallD:
@@ -108,12 +118,29 @@ class SmallD:
 
             self.gateway = Gateway(gateway_url)
 
-            for data in self.gateway:
-                logger.debug("gateway payload received: %s", data)
-                for listener in self.listeners:
-                    listener(AttrDict(json.loads(data)))
+            try:
+                for data in self.gateway:
+                    logger.debug("gateway payload received: %s", data)
+                    for listener in self.listeners:
+                        listener(data)
+            except GatewayClosedException as e:
+                if e.code not in recoverable_error_codes:
+                    raise
 
             time.sleep(5)
+
+
+class GatewayClosedException(Exception):
+    def __init__(self, code, reason):
+        super().__init__(f"{code}: {reason}")
+        self.code = code
+        self.reason = reason
+        
+    @staticmethod
+    def parse(data):
+        code = int.from_bytes(data[:2], "big")
+        reason = data[2:].decode("utf-8")
+        return GatewayClosedException(code, reason)
 
 
 class Gateway:
@@ -123,13 +150,16 @@ class Gateway:
 
     def __iter__(self):
         self.ws.connect(self.url)
-
-        for data in self.ws:
-            if data:
-                yield data
-
-            if not self.ws.connected:
-                break
+        
+        while self.ws.connected:
+            with self.ws.readlock:
+                opcode, data = self.ws.recv_data()
+  
+            if data and opcode == ABNF.OPCODE_TEXT:
+                decoded_data = data.decode("utf-8")
+                yield AttrDict(json.loads(decoded_data))
+            elif data and opcode == ABNF.OPCODE_CLOSE:
+                raise GatewayClosedException.parse(data)
 
     def send(self, data):
         self.ws.send(data)
