@@ -1,0 +1,12 @@
+[paths]
+source =
+  smalld/
+  */site-packages/smalld
+
+[run]
+source=
+  smalld
+  test
+
+[report]
+show_missing=True
