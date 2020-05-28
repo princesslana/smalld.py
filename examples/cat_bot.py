@@ -1,7 +1,6 @@
 from io import BytesIO
 
 import requests
-
 from smalld import SmallD
 
 smalld = SmallD()
