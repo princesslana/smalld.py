@@ -107,6 +107,9 @@ class SmallD:
         logger.debug("gateway payload sent: %s", payload)
         self.gateway.send(payload)
 
+    def reconnect(self):
+        self.gateway.close()
+
     def run(self):
         add_standard_listeners(self)
 
@@ -121,7 +124,9 @@ class SmallD:
                     for listener in self.listeners:
                         listener(data)
             except GatewayClosedException as e:
-                if e.code not in recoverable_error_codes:
+                if e.code in recoverable_error_codes:
+                    self.reconnect()
+                else:
                     raise
 
             time.sleep(5)
