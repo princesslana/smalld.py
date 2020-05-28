@@ -137,7 +137,7 @@ class GatewayClosedException(Exception):
         self.reason = reason
         
     @staticmethod
-    def parse(self, data):
+    def parse(data):
         code = int.from_bytes(data[:2], "big")
         reason = data[2:].decode("utf-8")
         return GatewayClosedException(code, reason)
