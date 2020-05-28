@@ -1,15 +1,15 @@
-from enum import Flag
-from functools import reduce
 import json
 import logging
 import operator
 import os
 import time
+from enum import Flag
+from functools import reduce
+
 from pkg_resources import get_distribution
 
 import requests
 from attrdict import AttrDict
-
 from websocket import WebSocket
 
 from .standard_listeners import add_standard_listeners
@@ -54,7 +54,7 @@ class SmallD:
 
         self.token = token
         self.base_url = base_url
-        self.intents = intents 
+        self.intents = intents
         self.listeners = []
 
         self.http = HttpClient(token, base_url)
