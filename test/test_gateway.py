@@ -1,17 +1,15 @@
 from unittest import mock
 
 import pytest
-from websocket import ABNF
-
 from smalld.smalld import Gateway, GatewayClosedException
-
+from websocket import ABNF
 
 CONNECTION_URL = "ws://example.url/"
 
 
 @pytest.fixture()
 def ws_mock():
-    with mock.patch('smalld.smalld.WebSocket', autospec=True) as ws_class_mock:
+    with mock.patch("smalld.smalld.WebSocket", autospec=True) as ws_class_mock:
         instance = ws_class_mock.return_value
         instance.readlock = mock.MagicMock()
         instance.connected = True
@@ -20,7 +18,7 @@ def ws_mock():
 
 
 def test_gateway_connects_on_iteration(ws_mock):
-    ws_mock.recv_data.return_value = ABNF.OPCODE_TEXT, b'{}'
+    ws_mock.recv_data.return_value = ABNF.OPCODE_TEXT, b"{}"
     gateway = Gateway(CONNECTION_URL)
 
     it = iter(gateway)
@@ -31,10 +29,7 @@ def test_gateway_connects_on_iteration(ws_mock):
 
 
 def test_gateway_yields_decoded_attrdict(ws_mock):
-    test_inputs = [
-        (ABNF.OPCODE_TEXT, b'{}'),
-        (ABNF.OPCODE_TEXT, b'{"key": "value"}'),
-    ]
+    test_inputs = [(ABNF.OPCODE_TEXT, b"{}"), (ABNF.OPCODE_TEXT, b'{"key": "value"}')]
     expected_results = [{}, {"key": "value"}]
     ws_mock.recv_data.side_effect = test_inputs
     gateway = Gateway(CONNECTION_URL)
@@ -49,8 +44,8 @@ def test_gateway_yields_decoded_attrdict(ws_mock):
 
 
 def test_gateway_skips_empty_data(ws_mock):
-    test_input, expected = (ABNF.OPCODE_TEXT, b'{}'), {}
-    ws_mock.recv_data.side_effect = [(ABNF.OPCODE_TEXT, b''), test_input]
+    test_input, expected = (ABNF.OPCODE_TEXT, b"{}"), {}
+    ws_mock.recv_data.side_effect = [(ABNF.OPCODE_TEXT, b""), test_input]
     gateway = Gateway(CONNECTION_URL)
 
     it = iter(gateway)
@@ -62,8 +57,8 @@ def test_gateway_skips_empty_data(ws_mock):
 
 
 def test_gateway_closes_on_close_event(ws_mock):
-    expected_code, expected_reason = 16, 'Reason'
-    ws_mock.recv_data.return_value = ABNF.OPCODE_CLOSE, b'\x00\x10Reason'
+    expected_code, expected_reason = 16, "Reason"
+    ws_mock.recv_data.return_value = ABNF.OPCODE_CLOSE, b"\x00\x10Reason"
     gateway = Gateway(CONNECTION_URL)
 
     it = iter(gateway)
