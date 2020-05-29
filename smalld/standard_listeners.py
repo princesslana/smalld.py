@@ -1,6 +1,6 @@
 import sys
 import time
-from threading import Thread
+from threading import Event, Thread
 
 
 def add_standard_listeners(smalld):
@@ -15,6 +15,7 @@ OP_INVALID_SESSION = 9
 OP_RESUME = 6
 OP_RECONNECT = 7
 OP_HELLO = 10
+OP_HEARTBEAT_ACK = 11
 
 
 class SequenceNumber:
@@ -93,9 +94,11 @@ class Heartbeat:
         self.sequence = sequence
         self.thread = None
         self.heartbeat_interval = None
+        self.received_ack = Event()
 
         smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
         smalld.on_gateway_payload(op=OP_HEARTBEAT)(self.on_heartbeat)
+        smalld.on_gateway_payload(op=OP_HEARTBEAT_ACK)(self.on_heartbeat_ack)
 
     def on_hello(self, data):
         self.heartbeat_interval = data.d.heartbeat_interval
@@ -107,11 +110,21 @@ class Heartbeat:
     def on_heartbeat(self, data):
         self.send_heartbeat()
 
+    def on_heartbeat_ack(self, data):
+        self.received_ack.set()
+
     def run_heartbeat_loop(self):
-        if self.heartbeat_interval:
-            time.sleep(self.heartbeat_interval / 1000)
+        interval = self.heartbeat_interval / 1000
+        time.sleep(interval)
+        while True:
             self.send_heartbeat()
-            self.run_heartbeat_loop()
+            time.sleep(interval)
+
+            if self.received_ack.is_set():
+                self.received_ack.clear()
+            else:
+                self.smalld.reconnect()
+                break
 
     def send_heartbeat(self):
         self.smalld.send_gateway_payload(
