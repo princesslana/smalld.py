@@ -90,6 +90,7 @@ class Heartbeat:
         self.heartbeat_interval = None
 
         smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
+        smalld.on_gateway_payload(op=OP_HEARTBEAT)(self.on_heartbeat)
 
     def on_hello(self, data):
         self.heartbeat_interval = data.d.heartbeat_interval
@@ -97,6 +98,9 @@ class Heartbeat:
         if not self.thread or not self.thread.is_alive():
             self.thread = Thread(target=self.run_heartbeat_loop)
             self.thread.start()
+
+    def on_heartbeat(self, data):
+        self.send_heartbeat()
 
     def run_heartbeat_loop(self):
         if self.heartbeat_interval:
