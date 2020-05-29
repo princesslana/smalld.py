@@ -13,6 +13,7 @@ OP_HEARTBEAT = 1
 OP_IDENTIFY = 2
 OP_INVALID_SESSION = 9
 OP_RESUME = 6
+OP_RECONNECT = 7
 OP_HELLO = 10
 
 
@@ -37,6 +38,7 @@ class Identify:
         smalld.on_ready()(self.on_ready)
         smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
         smalld.on_gateway_payload(op=OP_INVALID_SESSION)(self.on_invalid_session)
+        smalld.on_gateway_payload(op=OP_RECONNECT)(self.on_reconnect)
 
     def on_ready(self, data):
         self.session_id = data.session_id
@@ -51,6 +53,9 @@ class Identify:
         self.session_id = None
         time.sleep(2)
         self.identify()
+
+    def on_reconnect(self, data):
+        self.smalld.reconnect()
 
     def identify(self):
         self.smalld.send_gateway_payload(
