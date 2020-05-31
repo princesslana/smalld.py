@@ -27,6 +27,5 @@ jobs:
         pip install tox
     - name: Test with tox
       run: |
-        pyenv shims
-        echo $PATH
+        pyenv init
         tox
