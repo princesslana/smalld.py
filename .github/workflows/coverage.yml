@@ -27,5 +27,5 @@ jobs:
         pip install tox
     - name: Test with tox
       run: |
-        pyenv init | true
+        pyenv local 3.6.9 3.7.4 3.8.0
         tox
