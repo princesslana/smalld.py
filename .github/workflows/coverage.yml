@@ -26,4 +26,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
     - name: Test with tox
-      run: tox
+      run: |
+        pyenv rehash
+        tox
