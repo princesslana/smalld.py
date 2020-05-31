@@ -31,5 +31,5 @@ jobs:
         CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
       with:
         coverageCommand: |
-          pyenv local $(cat .python-version)
+          pyenv local 3.6.9 3.7.4 3.8.0
           tox
