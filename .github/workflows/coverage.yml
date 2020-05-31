@@ -3,8 +3,6 @@ name: Coverage
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   coverage:
@@ -35,3 +33,5 @@ jobs:
         ./cc-test-reporter before-build
         tox
         ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}
