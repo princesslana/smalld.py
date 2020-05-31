@@ -1,0 +1,23 @@
+name: Install
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  install:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+
+    runs-on: "${{ matrix.os }}"
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v1"
+        with:
+          python-version: "3.8"
+      - name: "Install"
+        run: "python -m pip install -e .[dev]"
+      - name: "Import package"
+        run: "python -c 'import smalld; print(smalld.__version__)'"
