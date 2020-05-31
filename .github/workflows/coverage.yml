@@ -14,8 +14,8 @@ jobs:
     - name: setup pyenv
       uses: "gabrielfalcao/pyenv-action@v5"
       with:
-        default: 3.8
-        versions: 3.6, 3.7
+        default: 3.8.0
+        versions: 3.6.9, 3.7.4
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
