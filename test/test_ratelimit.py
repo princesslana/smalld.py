@@ -96,13 +96,13 @@ def test_global_ratelimit_bucket(time):
 def test_ratelimit_passes_first_request():
     request = make_request("GET", "url")
     limiter = RateLimiter()
-    limiter.intercept_request(request)  # doesn't raise
+    limiter.on_request(request)  # doesn't raise
 
 
 def test_ratelimit_passes_good_response(time):
     response = make_response(200, make_ratelimit_headers())
     limiter = RateLimiter()
-    limiter.intercept_request(response)  # doesn't raise
+    limiter.on_response(response)  # doesn't raise
 
 
 @pytest.mark.parametrize(
@@ -130,7 +130,7 @@ def test_ratelimit_raises_on_limit_exhausted_response(
     time.set_to(start)
     limiter = RateLimiter()
     with pytest.raises(RateLimitException) as exc_info:
-        limiter.intercept_response(response)
+        limiter.on_response(response)
 
     e = exc_info.value
     assert e.reset == reset and e.is_global == is_global

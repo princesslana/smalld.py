@@ -84,11 +84,11 @@ class RateLimiter:
         self.resource_buckets = {}
         self.global_bucket = GlobalRateLimitBucket()
 
-    def intercept_request(self, request):
+    def on_request(self, request):
         self.global_bucket.take()
         self.get_bucket(request.method, request.url).take()
 
-    def intercept_response(self, response):
+    def on_response(self, response):
         request = response.request
         headers = response.headers
         bucket = None
