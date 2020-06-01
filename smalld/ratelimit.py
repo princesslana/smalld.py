@@ -19,19 +19,10 @@ class NoRateLimitBucket:
 
 
 class ResourceRateLimitBucket:
-    buckets = {}
-
     def __init__(self, bucket_id):
         self.bucket_id = bucket_id
         self.remaining = None
         self.reset = None
-
-    def __new__(cls, bucket_id):
-        try:
-            return cls.buckets[bucket_id]
-        except KeyError:
-            instance = super().__new__(cls)
-            return cls.buckets.setdefault(bucket_id, instance)
 
     def take(self):
         if (
@@ -81,7 +72,8 @@ class RateLimiter:
     no_ratelimit_bucket = NoRateLimitBucket()
 
     def __init__(self):
-        self.resource_buckets = {}
+        self.buckets = {}  # bucket id to bucket mapping
+        self.resource_buckets = {}  # resource to bucket mapping
         self.global_bucket = GlobalRateLimitBucket()
 
     def on_request(self, request):
@@ -112,13 +104,15 @@ class RateLimiter:
             pass
 
         bucket_id = url_group(url) or bucket_id
-        if bucket_id:
-            return self.resource_buckets.setdefault(
-                key, ResourceRateLimitBucket(bucket_id)
-            )
+        if not bucket_id:
+            return self.no_ratelimit_bucket
 
-        return self.no_ratelimit_bucket
-
+        try:
+            bucket = self.buckets[bucket_id]
+        except KeyError:
+            bucket = self.buckets[bucket_id] = ResourceRateLimitBucket(bucket_id)
+        self.resource_buckets[key] = bucket
+        return bucket
 
 groups = list(map(re.compile, [r"channels/(\d+)", r"guilds/(\d+)", r"webhooks/(\d+)"]))
 
