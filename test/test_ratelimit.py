@@ -1,7 +1,7 @@
 from unittest.mock import patch
+
 import pytest
 import requests
-
 from smalld.ratelimit import *
 
 
@@ -32,7 +32,9 @@ def make_response(method, url, status_code, headers):
     return res
 
 
-def make_ratelimit_headers(bucket="default", limit=10, remaining=1, reset=1, reset_after=1):
+def make_ratelimit_headers(
+    bucket="default", limit=10, remaining=1, reset=1, reset_after=1
+):
     return {
         "X-RateLimit-Limit": str(limit),
         "X-RateLimit-Remaining": str(remaining),
@@ -43,10 +45,7 @@ def make_ratelimit_headers(bucket="default", limit=10, remaining=1, reset=1, res
 
 
 def make_global_ratelimit_headers(retry_after):
-    return {
-        "Retry-After": str(retry_after),
-        "X-RateLimit-Global": "true",
-    }
+    return {"Retry-After": str(retry_after), "X-RateLimit-Global": "true"}
 
 
 @pytest.fixture(autouse=True)
@@ -82,11 +81,8 @@ def test_global_ratelimit_bucket(time):
 
     assert not limit.is_ratelimited
     limit.take()  # doesn't raise
-    
-    limit.update({
-        "Retry-After": "100",
-        "X-RateLimit-Global": "true",
-    })
+
+    limit.update({"Retry-After": "100", "X-RateLimit-Global": "true"})
 
     assert limit.is_ratelimited
 
@@ -109,11 +105,28 @@ def test_ratelimit_passes_good_response(time):
     limiter.intercept_request(response)  # doesn't raise
 
 
-@pytest.mark.parametrize("start, reset, is_global, response", [
-    (0, 1, True, make_response("GET", "url", 429, make_global_ratelimit_headers(100))),
-    (1000, 1001, False, make_response("GET", "url", 429, make_ratelimit_headers("abc123", 10, 0, 1001, 1))),
-])
-def test_ratelimit_raises_on_limit_exhausted_response(time, start, reset, is_global, response):
+@pytest.mark.parametrize(
+    "start, reset, is_global, response",
+    [
+        (
+            0,
+            1,
+            True,
+            make_response("GET", "url", 429, make_global_ratelimit_headers(100)),
+        ),
+        (
+            1000,
+            1001,
+            False,
+            make_response(
+                "GET", "url", 429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)
+            ),
+        ),
+    ],
+)
+def test_ratelimit_raises_on_limit_exhausted_response(
+    time, start, reset, is_global, response
+):
     time.set_to(start)
     limiter = RateLimiter()
     with pytest.raises(RateLimitException) as exc_info:
@@ -127,7 +140,9 @@ def test_ratelimit_raises_on_request_exhausted_resource(request, time):
     time.set_to(1000)
     request = make_request("GET", "url")
     limiter = RateLimiter()
-    bucket = limiter.resource_buckets[(request.method, request.url)] = ResourceRateLimitBucket("abc123")
+    bucket = limiter.resource_buckets[
+        (request.method, request.url)
+    ] = ResourceRateLimitBucket("abc123")
     bucket.update(make_ratelimit_headers("abc123", 10, 0, 1002, 2))
 
     with pytest.raises(RateLimitException) as exc_info:
@@ -136,15 +151,18 @@ def test_ratelimit_raises_on_request_exhausted_resource(request, time):
     assert exc_info.value.reset == 1002
 
 
-@pytest.mark.parametrize("url, group", [
-    ("channels/2909267986263572999", "channels/2909267986263572999"),
-    ("guilds/197038439483310086", "guilds/197038439483310086"),
-    ("webhooks/223704706495545344", "webhooks/223704706495545344"),
-    ("/channels/2909267986263572999/", "channels/2909267986263572999"),
-    ("/guilds/197038439483310086/members/{user.id}", "guilds/197038439483310086"),
-    ("/users/{user.id}", None),
-    ("/users/@me/guilds", None),
-    ("/invites/{invite.code}", None),
-])
+@pytest.mark.parametrize(
+    "url, group",
+    [
+        ("channels/2909267986263572999", "channels/2909267986263572999"),
+        ("guilds/197038439483310086", "guilds/197038439483310086"),
+        ("webhooks/223704706495545344", "webhooks/223704706495545344"),
+        ("/channels/2909267986263572999/", "channels/2909267986263572999"),
+        ("/guilds/197038439483310086/members/{user.id}", "guilds/197038439483310086"),
+        ("/users/{user.id}", None),
+        ("/users/@me/guilds", None),
+        ("/invites/{invite.code}", None),
+    ],
+)
 def test_url_group(url, group):
     assert url_group(url) == group

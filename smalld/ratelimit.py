@@ -1,8 +1,6 @@
-import time
 import re
+import time
 from math import ceil
-
-import requests
 
 
 class RateLimitException(Exception):
@@ -18,6 +16,7 @@ class NoRateLimitBucket:
 
     def update(self, values):
         return
+
 
 class ResourceRateLimitBucket:
     buckets = {}
@@ -35,7 +34,11 @@ class ResourceRateLimitBucket:
             return cls.buckets.setdefault(bucket_id, instance)
 
     def take(self):
-        if self.remaining is not None and self.remaining <= 0 and time.time() < self.reset:
+        if (
+            self.remaining is not None
+            and self.remaining <= 0
+            and time.time() < self.reset
+        ):
             raise RateLimitException(self.reset)
         self.remaining -= 1
 
@@ -44,7 +47,10 @@ class ResourceRateLimitBucket:
         self.reset = int(values["X-RateLimit-Reset"])
 
     def __eq__(self, other):
-        return isinstance(other, ResourceRateLimitBucket) and self.bucket_id == other.bucket_id
+        return (
+            isinstance(other, ResourceRateLimitBucket)
+            and self.bucket_id == other.bucket_id
+        )
 
     def __hash__(self):
         return hash(self.bucket_id)
@@ -63,7 +69,9 @@ class GlobalRateLimitBucket:
             raise RateLimitException(self.reset, is_global=True)
 
     def update(self, values):
-        self.is_ratelimited = values.get("X-RateLimit-Global", "false").lower() == "true"
+        self.is_ratelimited = (
+            values.get("X-RateLimit-Global", "false").lower() == "true"
+        )
         if self.is_ratelimited:
             retry_after = ceil(int(values.get("Retry-After", 0)) / 1000)
             self.reset = time.time() + retry_after
@@ -91,7 +99,9 @@ class RateLimiter:
         bucket.update(headers)
 
         if response.status_code == 429:
-            raise RateLimitException(bucket.reset, is_global=bucket is self.global_bucket)
+            raise RateLimitException(
+                bucket.reset, is_global=bucket is self.global_bucket
+            )
 
     def get_bucket(self, method, url, bucket_id=None):
         key = (method, url)
@@ -102,16 +112,14 @@ class RateLimiter:
 
         bucket_id = url_group(url) or bucket_id
         if bucket_id:
-            return self.resource_buckets.setdefault(key, ResourceRateLimitBucket(bucket_id))
+            return self.resource_buckets.setdefault(
+                key, ResourceRateLimitBucket(bucket_id)
+            )
 
         return self.no_ratelimit_bucket
 
 
-groups = list(map(re.compile, [
-    r"channels/(\d+)",
-    r"guilds/(\d+)",
-    r"webhooks/(\d+)",
-]))
+groups = list(map(re.compile, [r"channels/(\d+)", r"guilds/(\d+)", r"webhooks/(\d+)"]))
 
 
 def url_group(url):

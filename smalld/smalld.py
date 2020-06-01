@@ -135,7 +135,7 @@ class GatewayClosedException(Exception):
         super().__init__(f"{code}: {reason}")
         self.code = code
         self.reason = reason
-        
+
     @staticmethod
     def parse(data):
         code = int.from_bytes(data[:2], "big")
@@ -150,11 +150,11 @@ class Gateway:
 
     def __iter__(self):
         self.ws.connect(self.url)
-        
+
         while self.ws.connected:
             with self.ws.readlock:
                 opcode, data = self.ws.recv_data()
-  
+
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
