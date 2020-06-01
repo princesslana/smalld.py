@@ -78,7 +78,7 @@ def test_global_ratelimit_bucket(time):
     assert not limit.is_ratelimited
     limit.take()  # doesn't raise
 
-    limit.update({"Retry-After": "100", "X-RateLimit-Global": "true"})
+    limit.update(make_global_ratelimit_headers(100))
 
     assert limit.is_ratelimited
 
