@@ -99,7 +99,9 @@ class RateLimiter:
     def get_bucket(self, method, url, bucket_id=None):
         key = (method, url)
         try:
-            return self.resource_buckets[key]
+            bucket = self.resource_buckets[key]
+            if bucket_id is None or bucket_id and bucket_id == bucket.bucket_id:
+                return bucket
         except KeyError:
             pass
 
