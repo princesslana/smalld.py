@@ -89,13 +89,14 @@ class RateLimiter:
         self.get_bucket(request.method, request.url).take()
 
     def intercept_response(self, response):
+        request = response.request
         headers = response.headers
         bucket = None
         if headers.get("X-RateLimit-Global"):
             bucket = self.global_bucket
         else:
             bucket_id = headers.get("X-RateLimit-Bucket")
-            bucket = self.get_bucket(response.method, response.url, bucket_id)
+            bucket = self.get_bucket(request.method, request.url, bucket_id)
         bucket.update(headers)
 
         if response.status_code == 429:

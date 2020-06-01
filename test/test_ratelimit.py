@@ -17,18 +17,18 @@ class ControllableTime:
 
 
 def make_request(method, url):
-    req = requests.Request(method, url)
-    req.method = method
-    req.url = url
-    return req
+    return requests.Request(method, url)
 
 
-def make_response(method, url, status_code, headers):
+default_request = make_request("GET", "url")
+
+
+def make_response(status_code, headers, request=default_request):
     res = requests.Response()
     res.status_code = status_code
     res.headers.update(headers)
-    res.url = url
-    res.method = method
+    res.url = request.url
+    res.request = request
     return res
 
 
@@ -100,7 +100,7 @@ def test_ratelimit_passes_first_request():
 
 
 def test_ratelimit_passes_good_response(time):
-    response = make_response("GET", "url", 200, make_ratelimit_headers())
+    response = make_response(200, make_ratelimit_headers())
     limiter = RateLimiter()
     limiter.intercept_request(response)  # doesn't raise
 
@@ -112,14 +112,14 @@ def test_ratelimit_passes_good_response(time):
             0,
             1,
             True,
-            make_response("GET", "url", 429, make_global_ratelimit_headers(100)),
+            make_response(429, make_global_ratelimit_headers(100)),
         ),
         (
             1000,
             1001,
             False,
             make_response(
-                "GET", "url", 429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)
+                429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)
             ),
         ),
     ],
