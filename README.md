@@ -10,7 +10,7 @@ SmallD aims to be a minmalist client for the Discord API. It aims to let you use
 
 ## Installing
 
-SmallD.py can be install from pip.
+SmallD can be install from pip.
 
 ```console
 $ pip install smalld
@@ -18,7 +18,7 @@ $ pip install smalld
 
 ## Getting Started
 
-After [installing](#installing) smalld, and we have a [bot token for discord](https://discordpy.readthedocs.io/en/latest/discord.html), we can get started on
+After [installing](#installing) SmallD, and we have a [bot token for discord](https://discordpy.readthedocs.io/en/latest/discord.html), we can get started on
 making a bot.
 This section will guide you through the creation of a Ping bot.
 When someone types "++ping", it will respond with "pong".
@@ -82,7 +82,7 @@ The full code for the example can be found in (examples/ping_bot.py).
 
 This section outlines the API provided by SmallD.
 It does not aim to outline what are valid payloads, events, etc.
-For that, the (Discord developer documentation)[https://discord.com/developers/docs/intro] is
+For that, the [Discord developer documentation](https://discord.com/developers/docs/intro) is
 always helpful.
 
 ### Creating and Configuring
@@ -95,18 +95,34 @@ smalld.SmallD(
 )
 ```
 
+Creates a SmallD instance using the provided configuration.
+Intents are passed in using the `|` operator, for example
+`Intent.GUILD_MESSAGES | Intent.DIRECT_MESSAGES`.
+
 ### Running
 
 ```python
 SmallD.run()
 ```
 
+Runs SmallD. Connects to the Gateway, authenticates, and will maintain the connection.
+It will handle heartbeats and reconnections as necessary.
+
 ### Gateway Events
 
 ```python
-SmallD.on_*
-SmallD.on_gateway_payload(op=None, t=None)
+@SmallD.on_*
+@SmallD.on_gateway_payload(op=None, t=None)
 ```
+
+To listen to events from the Discord gateway use decorators that start with `on_`.
+`on_gateway_payload` can be used to listen for raw payloads, optionally filtering
+by the op and/or t fields of the payload.
+
+To listen for specific dispatch events, simply use `on_` followed by the event
+you wish to listen for.
+For example `on_message_create` for MESSAGE_CREATE events, `on_message_reaction_add`
+for MESSAGE_REACTION_ADD events, etc.
 
 ### Resources
 
@@ -117,6 +133,16 @@ SmallD.put(path, payload="")
 SmallD.patch(path, payload="")
 SmallD.delete(path)
 ```
+
+These methods send a request to a discord resource and returns the response.
+The payload is serialized to JSON before being sent.
+SmallD manages Discord's rate limits, throwing an exception if the rate limit would
+be broken. Also raises an exception on any non-2xx response.
+
+Attachments can be provided to the `post` method as a list of tuples.
+Each tuple should be (file name, content, mime-type).
+The file name and mime-type should be strings, with content being a file-like object.
+An example of sending an attachment can be found in (examples/cat_bot.py).
 
 ## Contact
 
