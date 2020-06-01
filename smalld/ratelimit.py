@@ -37,18 +37,6 @@ class ResourceRateLimitBucket:
         self.remaining = int(values["X-RateLimit-Remaining"])
         self.reset = int(values["X-RateLimit-Reset"])
 
-    def __eq__(self, other):
-        return (
-            isinstance(other, ResourceRateLimitBucket)
-            and self.bucket_id == other.bucket_id
-        )
-
-    def __hash__(self):
-        return hash(self.bucket_id)
-
-    def __repr__(self):
-        return f"<ResourceRateLimit ({self.bucket_id}, {self.remaining}, {self.reset})>"
-
 
 class GlobalRateLimitBucket:
     def __init__(self):
@@ -72,8 +60,10 @@ class RateLimiter:
     no_ratelimit_bucket = NoRateLimitBucket()
 
     def __init__(self):
-        self.buckets = {}  # bucket id to bucket mapping
-        self.resource_buckets = {}  # resource to bucket mapping
+        # bucket id to bucket mapping
+        self.buckets = {}
+        # resource to bucket mapping
+        self.resource_buckets = {}
         self.global_bucket = GlobalRateLimitBucket()
 
     def on_request(self, request):
@@ -100,7 +90,7 @@ class RateLimiter:
         key = (method, url)
         try:
             bucket = self.resource_buckets[key]
-            if bucket_id is None or bucket_id and bucket_id == bucket.bucket_id:
+            if bucket_id is None or bucket_id == bucket.bucket_id:
                 return bucket
         except KeyError:
             pass
