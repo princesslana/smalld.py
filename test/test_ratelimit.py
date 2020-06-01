@@ -16,11 +16,7 @@ class ControllableTime:
         self.time = time
 
 
-def make_request(method, url):
-    return requests.Request(method, url)
-
-
-default_request = make_request("GET", "url")
+default_request = requests.Request("GET", "url")
 
 
 def make_response(status_code, headers, request=default_request):
@@ -94,9 +90,8 @@ def test_global_ratelimit_bucket(time):
 
 
 def test_ratelimit_passes_first_request():
-    request = make_request("GET", "url")
     limiter = RateLimiter()
-    limiter.on_request(request)  # doesn't raise
+    limiter.on_request(default_request)  # doesn't raise
 
 
 def test_ratelimit_passes_good_response(time):
@@ -108,19 +103,12 @@ def test_ratelimit_passes_good_response(time):
 @pytest.mark.parametrize(
     "start, reset, is_global, response",
     [
-        (
-            0,
-            1,
-            True,
-            make_response(429, make_global_ratelimit_headers(100)),
-        ),
+        (0, 1, True, make_response(429, make_global_ratelimit_headers(100))),
         (
             1000,
             1001,
             False,
-            make_response(
-                429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)
-            ),
+            make_response(429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)),
         ),
     ],
 )
@@ -136,12 +124,11 @@ def test_ratelimit_raises_on_limit_exhausted_response(
     assert e.reset == reset and e.is_global == is_global
 
 
-def test_ratelimit_raises_on_request_exhausted_resource(request, time):
+def test_ratelimit_raises_on_request_exhausted_resource(time):
     time.set_to(1000)
-    request = make_request("GET", "url")
     limiter = RateLimiter()
     bucket = limiter.resource_buckets[
-        (request.method, request.url)
+        (default_request.method, default_request.url)
     ] = ResourceRateLimitBucket("abc123")
     bucket.update(make_ratelimit_headers("abc123", 10, 0, 1002, 2))
 
