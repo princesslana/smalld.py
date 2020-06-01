@@ -12,6 +12,7 @@ import requests
 from attrdict import AttrDict
 from websocket import ABNF, WebSocket
 
+from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
 logger = logging.getLogger("smalld")
@@ -174,6 +175,7 @@ class HttpClient:
         self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update(self.headers())
+        self.limiter = RateLimiter()
 
     def headers(self):
         return {
@@ -204,10 +206,15 @@ class HttpClient:
             args = {"json": payload}
         else:
             args = {}
+        req = requests.Request(method, f"{self.base_url}/{path}", **args)
 
-        r = self.session.request(method, f"{self.base_url}/{path}", **args)
+        prepped = self.session.prepare_request(req)
+        self.limiter.on_request(prepped)
 
-        return AttrDict(r.json()) if r.status_code != 204 else AttrDict()
+        res = self.session.send(prepped)
+        self.limiter.on_response(res)
+
+        return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
 
     def close(self):
         self.session.close()
