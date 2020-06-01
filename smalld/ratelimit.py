@@ -1,6 +1,7 @@
 import re
 import time
 from math import ceil
+from pkg_resources import resource_string
 
 
 class RateLimitException(Exception):
@@ -87,7 +88,8 @@ class RateLimiter:
             )
 
     def get_bucket(self, method, url, bucket_id=None):
-        key = (method, url)
+        resource = get_resource(url)
+        key = (method, resource)
         try:
             bucket = self.resource_buckets[key]
             if bucket_id is None or bucket_id == bucket.bucket_id:
@@ -95,7 +97,6 @@ class RateLimiter:
         except KeyError:
             pass
 
-        bucket_id = url_group(url) or bucket_id
         if not bucket_id:
             return self.no_ratelimit_bucket
 
@@ -106,13 +107,32 @@ class RateLimiter:
         self.resource_buckets[key] = bucket
         return bucket
 
-groups = list(map(re.compile, [r"channels/(\d+)", r"guilds/(\d+)", r"webhooks/(\d+)"]))
 
 
-def url_group(url):
+def extract_patterns(mappings):
+    resources_patterns = []
+
+    for mapping in mappings:
+        mapping = mapping.strip()
+        if not mapping or mapping.startswith("#"):
+            continue
+
+        pattern, resource = mapping.split("=")
+        pattern = re.compile(pattern)
+        resources_patterns.append((pattern, resource))
+
+    return resources_patterns
+
+
+mappings = resource_string("smalld.resources", "ratelimit_buckets").decode("utf-8")
+mappings = extract_patterns(mappings.split("\n"))
+
+
+def get_resource(url):
     url = url.strip().strip("/")
-    for group in groups:
-        match = group.match(url)
-        if match:
-            return match.group()
-    return None
+    for (pattern, template) in mappings:
+        match = pattern.fullmatch(url)
+        if not match:
+            continue
+        return match.expand(template)
+    return url

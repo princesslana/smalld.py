@@ -1,0 +1,69 @@
+# Audit Log
+guilds/(\d+)/audit-logs=guilds/\1/audit-logs
+
+# Channel
+channels/(\d+)=channels/\1
+channels/(\d+)/messages=channels/\1/messages
+channels/(\d+)/messages/(\d+)=channels/\1/messages/{message.id}
+channels/(\d+)/messages/(\d+)/reactions/(\w+)/@me=channels/\1/messages/{message.id}/reactions/{emoji}/@me
+channels/(\d+)/messages/(\d+)/reactions/(\w+)/(\d+)=channels/\1/messages/{message.id}/reactions/{emoji}/{user.id}
+channels/(\d+)/messages/(\d+)/reactions/(\w+)=channels/\1/messages/{message.id}/reactions/{emoji}
+channels/(\d+)/messages/(\d+)/reactions=channels/\1/messages/{message.id}/reactions
+channels/(\d+)/messages/bulk-delete=channels/\1/messages/bulk-delete
+channels/(\d+)/messages/bulk_delete=channels/\1/messages/bulk_delete
+channels/(\d+)/permissions/(\d+)=channels/\1/permissions/{overwrite.id}
+channels/(\d+)/invites=channels/\1/invites
+channels/(\d+)/typing=channels/\1/typing
+channels/(\d+)/pins=channels/\1/pins
+channels/(\d+)/pins/(\d+)=channels/\1/pins/{message.id}
+channels/(\d+)/recipients/(\d+)=channels/\1/recipients/{user.id}
+
+# Emoji
+guilds/(\d+)/emojis=guilds/\1/emojis
+guilds/(\d+)/emojis/(\d+)=guilds/\1/emojis/{emoji.id}
+
+# Guild
+guilds=guilds
+guilds/(\d+)=guilds/\1
+guilds/(\d+)/preview=guilds/\1/preview
+guilds/(\d+)/channels=guilds/\1/channels
+guilds/(\d+)/members/(\d+)=guilds/\1/members/{user.id}
+guilds/(\d+)/members=guilds/\1/members
+guilds/(\d+)/members/@me/nick=guilds/\1/members/@me/nick
+guilds/(\d+)/members/(\d+)/roles/(\d+)=guilds/\1/members/{user.id}/roles/{role.id}
+guilds/(\d+)/bans=guilds/\1/bans
+guilds/(\d+)/bans/(\d+)=guilds/\1/bans/{user.id}
+guilds/(\d+)/roles=guilds/\1/roles
+guilds/(\d+)/roles/(\d+)=guilds/\1/roles/{role.id}
+guilds/(\d+)/prune=guilds/\1/prune
+guilds/(\d+)/regions=guilds/\1/regions
+guilds/(\d+)/invites=guilds/\1/invites
+guilds/(\d+)/integrations=guilds/\1/integrations
+guilds/(\d+)/integrations/(\d+)=guilds/\1/integrations/{integration.id}
+guilds/(\d+)/integrations/(\d+)/sync=guilds/\1/integrations/{integration.id}/sync
+guilds/(\d+)/widget=guilds/\1/widget
+guilds/(\d+)/embed=guilds/\1/embed
+guilds/(\d+)/vanity-url=guilds/\1/vanity-url
+guilds/(\d+)/widget.png=guilds/\1/widget.png
+
+# Invite
+invites/(\w+)=invites/{invite.code}
+
+# User
+users/@me=users/@me
+users/(\d+)=users/{user.id}
+users/@me/guilds=users/@me/guilds
+users/@me/guilds/(\d+)=users/@me/guilds/\1
+users/@me/channels=users/@me/channels
+users/@me/connections=users/@me/connections
+
+# Voice
+voice/regions=voice/regions
+
+# Webhook
+channels/(\d+)/webhooks=channels/\1/webhooks
+guilds/(\d+)/webhooks=guilds/\1/webhooks
+webhooks/(\d+)=webhooks/\1
+webhooks/(\d+)/(\w+)=webhooks/\1/{webhook.token}
+webhooks/(\d+)/(\w+)/slack=webhooks/\1/{webhook.token}/slack
+webhooks/(\d+)/(\w+)/github=webhooks/\1/{webhook.token}/github

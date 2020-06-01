@@ -139,17 +139,17 @@ def test_ratelimit_raises_on_request_exhausted_resource(time):
 
 
 @pytest.mark.parametrize(
-    "url, group",
+    "url, resource",
     [
         ("channels/2909267986263572999", "channels/2909267986263572999"),
         ("guilds/197038439483310086", "guilds/197038439483310086"),
         ("webhooks/223704706495545344", "webhooks/223704706495545344"),
         ("/channels/2909267986263572999/", "channels/2909267986263572999"),
-        ("/guilds/197038439483310086/members/{user.id}", "guilds/197038439483310086"),
-        ("/users/{user.id}", None),
-        ("/users/@me/guilds", None),
-        ("/invites/{invite.code}", None),
+        ("/guilds/197038439483310086/members/63269852323648", "guilds/197038439483310086/members/{user.id}"),
+        ("/users/9864325349523", "users/{user.id}"),
+        ("/users/@me/guilds", "users/@me/guilds"),
+        ("/invites/0vCdhLbwjZZTWZLD", "invites/{invite.code}"),
     ],
 )
-def test_url_group(url, group):
-    assert url_group(url) == group
+def test_get_resource(url, resource):
+    assert get_resource(url) == resource
