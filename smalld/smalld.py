@@ -12,6 +12,7 @@ import requests
 from attrdict import AttrDict
 from websocket import ABNF, WebSocket
 
+from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
 logger = logging.getLogger("smalld")
@@ -135,7 +136,7 @@ class GatewayClosedException(Exception):
         super().__init__(f"{code}: {reason}")
         self.code = code
         self.reason = reason
-        
+
     @staticmethod
     def parse(data):
         code = int.from_bytes(data[:2], "big")
@@ -150,11 +151,11 @@ class Gateway:
 
     def __iter__(self):
         self.ws.connect(self.url)
-        
+
         while self.ws.connected:
             with self.ws.readlock:
                 opcode, data = self.ws.recv_data()
-  
+
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
@@ -174,6 +175,7 @@ class HttpClient:
         self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update(self.headers())
+        self.limiter = RateLimiter()
 
     def headers(self):
         return {
@@ -205,9 +207,11 @@ class HttpClient:
         else:
             args = {}
 
-        r = self.session.request(method, f"{self.base_url}/{path}", **args)
+        self.limiter.on_request(method, path)
+        res = self.session.request(method, f"{self.base_url}/{path}", **args)
+        self.limiter.on_response(method, path, res.headers, res.status_code)
 
-        return AttrDict(r.json()) if r.status_code != 204 else AttrDict()
+        return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
 
     def close(self):
         self.session.close()
