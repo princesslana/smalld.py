@@ -6,8 +6,6 @@
 
 SmallD aims to be a minmalist client for the Discord API. It aims to let you use the Discord API, without hiding or abstracting it.
 
-## Table of Contents
-
 ## Installing
 
 SmallD can be install from pip.
