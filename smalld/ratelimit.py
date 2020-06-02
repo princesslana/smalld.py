@@ -129,7 +129,7 @@ mappings = extract_patterns(mappings.split("\n"))
 def get_resource(path):
     path = path.strip().strip("/")
     for (pattern, template) in mappings:
-        match = pattern.match(path)
+        match = pattern.fullmatch(path)
         if not match:
             continue
         return match.expand(template)
