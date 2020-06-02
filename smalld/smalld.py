@@ -206,13 +206,10 @@ class HttpClient:
             args = {"json": payload}
         else:
             args = {}
-        req = requests.Request(method, f"{self.base_url}/{path}", **args)
 
-        prepped = self.session.prepare_request(req)
-        self.limiter.on_request(prepped)
-
-        res = self.session.send(prepped)
-        self.limiter.on_response(res)
+        self.limiter.on_request(method, path)
+        res = self.session.request(method, f"{self.base_url}/{path}", **args)
+        self.limiter.on_response(method, path, res.headers, res.status_code)
 
         return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
 

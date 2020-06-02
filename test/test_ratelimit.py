@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-import requests
 from smalld.ratelimit import *
 
 
@@ -14,18 +13,6 @@ class ControllableTime:
 
     def set_to(self, time):
         self.time = time
-
-
-default_request = requests.Request("GET", "url")
-
-
-def make_response(status_code, headers, request=default_request):
-    res = requests.Response()
-    res.status_code = status_code
-    res.headers.update(headers)
-    res.url = request.url
-    res.request = request
-    return res
 
 
 def make_ratelimit_headers(
@@ -91,24 +78,35 @@ def test_global_ratelimit_bucket(time):
 
 def test_ratelimit_passes_first_request():
     limiter = RateLimiter()
-    limiter.on_request(default_request)  # doesn't raise
+    limiter.on_request("GET", "/path/to/resource")  # doesn't raise
 
 
 def test_ratelimit_passes_good_response(time):
-    response = make_response(200, make_ratelimit_headers())
     limiter = RateLimiter()
-    limiter.on_response(response)  # doesn't raise
+    limiter.on_response(
+        "GET", "/path/to/resource", make_ratelimit_headers(), 200
+    )  # doesn't raise
 
 
 @pytest.mark.parametrize(
     "start, reset, is_global, response",
     [
-        (0, 1, True, make_response(429, make_global_ratelimit_headers(100))),
+        (
+            0,
+            1,
+            True,
+            ("GET", "/path/to/resource", make_global_ratelimit_headers(100), 429),
+        ),
         (
             1000,
             1001,
             False,
-            make_response(429, make_ratelimit_headers("abc123", 10, 0, 1001, 1)),
+            (
+                "GET",
+                "/path/to/resource",
+                make_ratelimit_headers("abc123", 10, 0, 1001, 1),
+                429,
+            ),
         ),
     ],
 )
@@ -118,7 +116,7 @@ def test_ratelimit_raises_on_limit_exhausted_response(
     time.set_to(start)
     limiter = RateLimiter()
     with pytest.raises(RateLimitException) as exc_info:
-        limiter.on_response(response)
+        limiter.on_response(*response)
 
     e = exc_info.value
     assert e.reset == reset and e.is_global == is_global
@@ -128,28 +126,32 @@ def test_ratelimit_raises_on_request_exhausted_resource(time):
     time.set_to(1000)
     limiter = RateLimiter()
     bucket = limiter.resource_buckets[
-        (default_request.method, default_request.url)
+        ("GET", "path/to/resource")
     ] = ResourceRateLimitBucket("abc123")
     bucket.update(make_ratelimit_headers("abc123", 10, 0, 1002, 2))
 
     with pytest.raises(RateLimitException) as exc_info:
-        bucket.take()
+        limiter.on_request("GET", "path/to/resource")
 
     assert exc_info.value.reset == 1002
 
 
 @pytest.mark.parametrize(
-    "url, resource",
+    "path, resource",
     [
         ("channels/2909267986263572999", "channels/2909267986263572999"),
         ("guilds/197038439483310086", "guilds/197038439483310086"),
         ("webhooks/223704706495545344", "webhooks/223704706495545344"),
         ("/channels/2909267986263572999/", "channels/2909267986263572999"),
-        ("/guilds/197038439483310086/members/63269852323648", "guilds/197038439483310086/members/{user.id}"),
+        (
+            "/guilds/197038439483310086/members/63269852323648",
+            "guilds/197038439483310086/members/{user.id}",
+        ),
         ("/users/9864325349523", "users/{user.id}"),
         ("/users/@me/guilds", "users/@me/guilds"),
         ("/invites/0vCdhLbwjZZTWZLD", "invites/{invite.code}"),
+        ("/unknown/path", "unknown/path"),
     ],
 )
-def test_get_resource(url, resource):
-    assert get_resource(url) == resource
+def test_get_resource(path, resource):
+    assert get_resource(path) == resource

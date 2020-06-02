@@ -1,6 +1,7 @@
 import re
 import time
 from math import ceil
+
 from pkg_resources import resource_string
 
 
@@ -67,28 +68,26 @@ class RateLimiter:
         self.resource_buckets = {}
         self.global_bucket = GlobalRateLimitBucket()
 
-    def on_request(self, request):
+    def on_request(self, method, path):
         self.global_bucket.take()
-        self.get_bucket(request.method, request.url).take()
+        self.get_bucket(method, path).take()
 
-    def on_response(self, response):
-        request = response.request
-        headers = response.headers
+    def on_response(self, method, path, headers, status_code):
         bucket = None
         if headers.get("X-RateLimit-Global"):
             bucket = self.global_bucket
         else:
             bucket_id = headers.get("X-RateLimit-Bucket")
-            bucket = self.get_bucket(request.method, request.url, bucket_id)
+            bucket = self.get_bucket(method, path, bucket_id)
         bucket.update(headers)
 
-        if response.status_code == 429:
+        if status_code == 429:
             raise RateLimitException(
                 bucket.reset, is_global=bucket is self.global_bucket
             )
 
-    def get_bucket(self, method, url, bucket_id=None):
-        resource = get_resource(url)
+    def get_bucket(self, method, path, bucket_id=None):
+        resource = get_resource(path)
         key = (method, resource)
         try:
             bucket = self.resource_buckets[key]
@@ -106,7 +105,6 @@ class RateLimiter:
             bucket = self.buckets[bucket_id] = ResourceRateLimitBucket(bucket_id)
         self.resource_buckets[key] = bucket
         return bucket
-
 
 
 def extract_patterns(mappings):
@@ -128,11 +126,11 @@ mappings = resource_string("smalld.resources", "ratelimit_buckets").decode("utf-
 mappings = extract_patterns(mappings.split("\n"))
 
 
-def get_resource(url):
-    url = url.strip().strip("/")
+def get_resource(path):
+    path = path.strip().strip("/")
     for (pattern, template) in mappings:
-        match = pattern.fullmatch(url)
+        match = pattern.match(path)
         if not match:
             continue
         return match.expand(template)
-    return url
+    return path
