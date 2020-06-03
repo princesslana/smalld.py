@@ -214,6 +214,8 @@ class HttpClient:
         res = self.session.request(method, f"{self.base_url}/{path}", **args)
         self.limiter.on_response(method, path, res.headers, res.status_code)
 
+        res.raise_for_status()
+
         return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
 
     def close(self):
