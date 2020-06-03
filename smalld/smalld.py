@@ -169,6 +169,16 @@ class Gateway:
         self.ws.close()
 
 
+class HttpError(Exception):
+    def __init__(self, *args, response=None, **kwargs):
+        self.response = response
+        super().__init__(*args, **kwargs)
+
+
+class ConnectionError(Exception):
+    pass
+
+
 class HttpClient:
     def __init__(self, token, base_url):
         self.token = token
@@ -211,12 +221,25 @@ class HttpClient:
             args["params"] = params
 
         self.limiter.on_request(method, path)
-        res = self.session.request(method, f"{self.base_url}/{path}", **args)
+
+        try:
+            res = self.session.request(method, f"{self.base_url}/{path}", **args)
+        except (requests.ConnectionError, requests.Timeout):
+            raise ConnectionError from None
+        except requests.RequestException:
+            raise HttpError from None
+
         self.limiter.on_response(method, path, res.headers, res.status_code)
 
-        res.raise_for_status()
+        if not res.ok:
+            raise HttpError(response=res)
 
-        return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
+        try:
+            content = res.json() if res.status_code != 204 else {}
+        except request.RequestException:
+            raise HttpError(response=res) from None
+
+        return AttrDict(content)
 
     def close(self):
         self.session.close()
