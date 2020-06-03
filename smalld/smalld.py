@@ -183,22 +183,22 @@ class HttpClient:
             "User-Agent": f"DiscordBot (https://github.com/princesslana/smalld.py, {__version__})",
         }
 
-    def get(self, path):
-        return self.send_request("GET", path)
+    def get(self, path, params=None):
+        return self.send_request("GET", path, params=params)
 
-    def post(self, path, payload="", attachments=None):
-        return self.send_request("POST", path, payload, attachments)
+    def post(self, path, payload="", attachments=None, params=None):
+        return self.send_request("POST", path, payload, attachments, params)
 
-    def put(self, path, payload=""):
-        return self.send_request("PUT", path, payload)
+    def put(self, path, payload="", params=None):
+        return self.send_request("PUT", path, payload, params=params)
 
-    def patch(self, path, payload=""):
-        return self.send_request("PATCH", path, payload)
+    def patch(self, path, payload="", params=None):
+        return self.send_request("PATCH", path, payload, params=params)
 
-    def delete(self, path):
-        return self.send_request("DELETE", path)
+    def delete(self, path, params=None):
+        return self.send_request("DELETE", path, params=params)
 
-    def send_request(self, method, path, payload="", attachments=None):
+    def send_request(self, method, path, payload="", attachments=None, params=None):
         if attachments:
             files = [(f"file{idx}", a) for idx, a in enumerate(attachments)]
             args = {"data": {"payload_json": json.dumps(payload)}, "files": files}
@@ -206,6 +206,9 @@ class HttpClient:
             args = {"json": payload}
         else:
             args = {}
+
+        if params:
+            args["params"] = params
 
         self.limiter.on_request(method, path)
         res = self.session.request(method, f"{self.base_url}/{path}", **args)
