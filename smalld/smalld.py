@@ -12,6 +12,7 @@ import requests
 from attrdict import AttrDict
 from websocket import ABNF, WebSocket
 
+from .exceptions import ConnectionError, GatewayClosedException, HttpError
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
@@ -131,19 +132,6 @@ class SmallD:
             time.sleep(5)
 
 
-class GatewayClosedException(Exception):
-    def __init__(self, code, reason):
-        super().__init__(f"{code}: {reason}")
-        self.code = code
-        self.reason = reason
-
-    @staticmethod
-    def parse(data):
-        code = int.from_bytes(data[:2], "big")
-        reason = data[2:].decode("utf-8")
-        return GatewayClosedException(code, reason)
-
-
 class Gateway:
     def __init__(self, url):
         self.url = url
@@ -167,16 +155,6 @@ class Gateway:
 
     def close(self):
         self.ws.close()
-
-
-class HttpError(Exception):
-    def __init__(self, *args, response=None, **kwargs):
-        self.response = response
-        super().__init__(*args, **kwargs)
-
-
-class ConnectionError(Exception):
-    pass
 
 
 class HttpClient:

@@ -4,12 +4,7 @@ from math import ceil
 
 from pkg_resources import resource_string
 
-
-class RateLimitException(Exception):
-    def __init__(self, reset, *, is_global=False):
-        super().__init__(f"rate limited until {reset}")
-        self.reset = reset
-        self.is_global = is_global
+from .exceptions import RateLimitException
 
 
 class NoRateLimitBucket:
