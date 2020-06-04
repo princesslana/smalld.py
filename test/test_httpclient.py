@@ -88,9 +88,7 @@ def test_httpclient_handles_no_content():
 
 
 @responses.activate
-@pytest.mark.parametrize("invalid_json", [
-    "", "invalid json", '{"key": value}'
-])
+@pytest.mark.parametrize("invalid_json", ["", "invalid json", '{"key": value}'])
 def test_httpclient_raises_for_response_decoding_errors(invalid_json):
     responses.add(responses.GET, "https://domain.com/get", body=invalid_json)
 
