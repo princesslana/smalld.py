@@ -203,9 +203,9 @@ class HttpClient:
         try:
             res = self.session.request(method, f"{self.base_url}/{path}", **args)
         except (requests.ConnectionError, requests.Timeout):
-            raise ConnectionError from None
+            raise ConnectionError
         except requests.RequestException:
-            raise HttpError from None
+            raise HttpError
 
         self.limiter.on_response(method, path, res.headers, res.status_code)
 
@@ -215,7 +215,7 @@ class HttpClient:
         try:
             content = res.json() if res.status_code != 204 else {}
         except request.RequestException:
-            raise HttpError(response=res) from None
+            raise HttpError(response=res)
 
         return AttrDict(content)
 
