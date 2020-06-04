@@ -2,7 +2,8 @@ from setuptools import setup
 
 setup(
     name="smalld",
-    packages=["smalld"],
+    packages=["smalld", "smalld.resources"],
+    package_data={"smalld.resources": ["*"]},
     use_scm_version=True,
     install_requires=[
         "attrdict>=2.0.1",
