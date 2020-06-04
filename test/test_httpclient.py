@@ -77,3 +77,21 @@ def test_httpclient_calls_limiter_before_and_after_request(limiter):
         "GET", "get", dict(**headers, **extra_headers), 200
     )
     assert len(responses.calls) == 1
+
+
+@responses.activate
+def test_httpclient_handles_no_content():
+    responses.add(responses.GET, "https://domain.com/get", status=204)
+    client = HttpClient("token", "https://domain.com")
+    res = client.get("get")
+    assert res == {}
+
+
+@responses.activate
+@pytest.mark.parametrize("invalid_json", ["", "invalid json", '{"key": value}'])
+def test_httpclient_raises_for_response_decoding_errors(invalid_json):
+    responses.add(responses.GET, "https://domain.com/get", body=invalid_json)
+
+    client = HttpClient("token", "https://domain.com")
+    with pytest.raises(HttpError):
+        client.get("get")
