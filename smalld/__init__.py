@@ -4,5 +4,9 @@ from .exceptions import (
     HttpError,
     RateLimitException,
     SmallDException,
-)  # noqa
-from .smalld import Intent, SmallD, __version__  # noqa
+)
+
+
+
+
+from .smalld import Intent, SmallD, __version__
