@@ -5,8 +5,4 @@ from .exceptions import (
     RateLimitException,
     SmallDException,
 )
-
-
-
-
 from .smalld import Intent, SmallD, __version__

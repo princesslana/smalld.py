@@ -73,5 +73,7 @@ def test_httpclient_calls_limiter_before_and_after_request(limiter):
     client.get("get")
 
     limiter.on_request.assert_called_once_with("GET", "get")
-    limiter.on_response.assert_called_once_with("GET", "get", dict(**headers, **extra_headers), 200)
+    limiter.on_response.assert_called_once_with(
+        "GET", "get", dict(**headers, **extra_headers), 200
+    )
     assert len(responses.calls) == 1
