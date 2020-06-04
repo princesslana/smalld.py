@@ -214,7 +214,7 @@ class HttpClient:
 
         try:
             content = res.json() if res.status_code != 204 else {}
-        except requests.RequestException:
+        except json.JSONDecodeError:
             raise HttpError(response=res)
 
         return AttrDict(content)
