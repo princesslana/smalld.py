@@ -12,6 +12,7 @@ import requests
 from attrdict import AttrDict
 from websocket import ABNF, WebSocket
 
+from .exceptions import ConnectionError, GatewayClosedException, HttpError
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
@@ -131,19 +132,6 @@ class SmallD:
             time.sleep(5)
 
 
-class GatewayClosedException(Exception):
-    def __init__(self, code, reason):
-        super().__init__(f"{code}: {reason}")
-        self.code = code
-        self.reason = reason
-
-    @staticmethod
-    def parse(data):
-        code = int.from_bytes(data[:2], "big")
-        reason = data[2:].decode("utf-8")
-        return GatewayClosedException(code, reason)
-
-
 class Gateway:
     def __init__(self, url):
         self.url = url
@@ -183,22 +171,22 @@ class HttpClient:
             "User-Agent": f"DiscordBot (https://github.com/princesslana/smalld.py, {__version__})",
         }
 
-    def get(self, path):
-        return self.send_request("GET", path)
+    def get(self, *args, **kwargs):
+        return self.send_request("GET", *args, **kwargs)
 
-    def post(self, path, payload="", attachments=None):
-        return self.send_request("POST", path, payload, attachments)
+    def post(self, *args, **kwargs):
+        return self.send_request("POST", *args, **kwargs)
 
-    def put(self, path, payload=""):
-        return self.send_request("PUT", path, payload)
+    def put(self, *args, **kwargs):
+        return self.send_request("PUT", *args, **kwargs)
 
-    def patch(self, path, payload=""):
-        return self.send_request("PATCH", path, payload)
+    def patch(self, *args, **kwargs):
+        return self.send_request("PATCH", *args, **kwargs)
 
-    def delete(self, path):
-        return self.send_request("DELETE", path)
+    def delete(self, *args, **kwargs):
+        return self.send_request("DELETE", *args, **kwargs)
 
-    def send_request(self, method, path, payload="", attachments=None):
+    def send_request(self, method, path, payload="", attachments=None, params=None):
         if attachments:
             files = [(f"file{idx}", a) for idx, a in enumerate(attachments)]
             args = {"data": {"payload_json": json.dumps(payload)}, "files": files}
@@ -207,11 +195,29 @@ class HttpClient:
         else:
             args = {}
 
+        if params:
+            args["params"] = params
+
         self.limiter.on_request(method, path)
-        res = self.session.request(method, f"{self.base_url}/{path}", **args)
+
+        try:
+            res = self.session.request(method, f"{self.base_url}/{path}", **args)
+        except (requests.ConnectionError, requests.Timeout):
+            raise ConnectionError
+        except requests.RequestException:
+            raise HttpError
+
         self.limiter.on_response(method, path, res.headers, res.status_code)
 
-        return AttrDict(res.json()) if res.status_code != 204 else AttrDict()
+        if not res.ok:
+            raise HttpError(response=res)
+
+        try:
+            content = res.json() if res.status_code != 204 else {}
+        except request.RequestException:
+            raise HttpError(response=res)
+
+        return AttrDict(content)
 
     def close(self):
         self.session.close()
