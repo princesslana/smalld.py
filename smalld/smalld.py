@@ -171,20 +171,20 @@ class HttpClient:
             "User-Agent": f"DiscordBot (https://github.com/princesslana/smalld.py, {__version__})",
         }
 
-    def get(self, path, params=None):
-        return self.send_request("GET", path, params=params)
+    def get(self, *args, **kwargs):
+        return self.send_request("GET", *args, **kwargs)
 
-    def post(self, path, payload="", attachments=None, params=None):
-        return self.send_request("POST", path, payload, attachments, params)
+    def post(self, *args, **kwargs):
+        return self.send_request("POST", *args, **kwargs)
 
-    def put(self, path, payload="", params=None):
-        return self.send_request("PUT", path, payload, params=params)
+    def put(self, *args, **kwargs):
+        return self.send_request("PUT", *args, **kwargs)
 
-    def patch(self, path, payload="", params=None):
-        return self.send_request("PATCH", path, payload, params=params)
+    def patch(self, *args, **kwargs):
+        return self.send_request("PATCH", *args, **kwargs)
 
-    def delete(self, path, params=None):
-        return self.send_request("DELETE", path, params=params)
+    def delete(self, *args, **kwargs):
+        return self.send_request("DELETE", *args, **kwargs)
 
     def send_request(self, method, path, payload="", attachments=None, params=None):
         if attachments:
