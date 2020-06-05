@@ -116,7 +116,7 @@ class Heartbeat:
     def run_heartbeat_loop(self):
         interval = self.heartbeat_interval / 1000
         time.sleep(interval)
-        while True:
+        while not self.smalld.closed:
             self.send_heartbeat()
             time.sleep(interval)
 

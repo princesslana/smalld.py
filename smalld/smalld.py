@@ -5,6 +5,7 @@ import os
 import time
 from enum import Flag
 from functools import reduce
+from threading import Event
 
 from pkg_resources import get_distribution
 
@@ -68,6 +69,7 @@ class SmallD:
         self.base_url = base_url
         self.intents = intents
         self.listeners = []
+        self.closed_event = Event()
 
         self.http = HttpClient(token, base_url)
 
@@ -76,6 +78,8 @@ class SmallD:
         self.put = self.http.put
         self.patch = self.http.patch
         self.delete = self.http.delete
+
+        add_standard_listeners(self)
 
     def __getattr__(self, name):
         if name.startswith("on_"):
@@ -109,11 +113,25 @@ class SmallD:
         logger.debug("gateway payload sent: %s", payload)
         self.gateway.send(payload)
 
+    @property
+    def closed(self):
+        return self.closed_event.is_set()
+
     def reconnect(self):
         self.gateway.close()
 
+    def close(self):
+        self.closed_event.set()
+        self.reconnect()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self):
+        self.close()
+
     def run(self):
-        add_standard_listeners(self)
+        self.closed_event.clear()
 
         while True:
             gateway_url = self.get("/gateway/bot").url
@@ -129,6 +147,8 @@ class SmallD:
                 if e.code not in recoverable_error_codes:
                     raise
 
+            if self.closed_event.is_set():
+                break
             time.sleep(5)
 
 
