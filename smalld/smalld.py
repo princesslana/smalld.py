@@ -131,9 +131,12 @@ class SmallD:
         self.close()
 
     def run(self):
+        logger.info("Running...")
+
         self.closed_event.clear()
 
         while True:
+            logger.info("Gateway connecting...")
             gateway_url = self.get("/gateway/bot").url
 
             self.gateway = Gateway(gateway_url)
@@ -149,6 +152,8 @@ class SmallD:
 
             if self.closed_event.is_set():
                 break
+
+            logger.info("Pausing before reconnect...")
             time.sleep(5)
 
 
@@ -158,6 +163,7 @@ class Gateway:
         self.ws = WebSocket()
 
     def __iter__(self):
+
         self.ws.connect(self.url)
 
         while self.ws.connected:
