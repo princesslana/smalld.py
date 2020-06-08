@@ -122,13 +122,15 @@ class SmallD:
 
     def close(self):
         self.closed_event.set()
+        self.http.close()
         self.reconnect()
 
     def __enter__(self):
         return self
 
-    def __exit__(self):
-        self.close()
+    def __exit__(self, *args):
+        if not self.closed:
+            self.close()
 
     def run(self):
         self.closed_event.clear()
