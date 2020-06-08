@@ -1,6 +1,9 @@
+import logging
 import sys
 import time
 from threading import Event, Thread
+
+logger = logging.getLogger("smalld")
 
 
 def add_standard_listeners(smalld):
@@ -37,12 +40,17 @@ class Identify:
         self.session_id = None
 
         smalld.on_ready()(self.on_ready)
+        smalld.on_resumed()(self.on_resumed)
         smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
         smalld.on_gateway_payload(op=OP_INVALID_SESSION)(self.on_invalid_session)
         smalld.on_gateway_payload(op=OP_RECONNECT)(self.on_reconnect)
 
     def on_ready(self, data):
+        logger.info("Ready.")
         self.session_id = data.session_id
+
+    def on_resumed(self, data):
+        logger.info("Resumed.")
 
     def on_hello(self, data):
         if self.session_id and self.sequence.number:
@@ -59,6 +67,7 @@ class Identify:
         self.smalld.reconnect()
 
     def identify(self):
+        logger.info("Identifying...")
         self.smalld.send_gateway_payload(
             {
                 "op": OP_IDENTIFY,
@@ -76,6 +85,7 @@ class Identify:
         )
 
     def resume(self):
+        logger.info("Resuming...")
         self.smalld.send_gateway_payload(
             {
                 "op": OP_RESUME,
