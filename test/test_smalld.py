@@ -63,20 +63,9 @@ def sleep_mock():
         yield sleep_mock
 
 
-@pytest.fixture(autouse=True)
-def add_standard_listeners():
-    with patch("smalld.smalld.add_standard_listeners") as add_standard_listeners:
-        yield add_standard_listeners
-
-
-def test_smalld_adds_standard_listeners(add_standard_listeners):
-    smalld = SmallD("token")
-    add_standard_listeners.assert_called_once_with(smalld)
-
-
 test_data = [
-    {"op": 1, "t": None, "d": {"key1": "value1"}},
-    {"op": 0, "t": "EVENT", "d": {"key1", "value1"}},
+    {"op": 1, "t": None, "d": {"key1": "value1"}, "s": 0},
+    {"op": 0, "t": "EVENT", "d": {"key1", "value1"}, "s": 0},
 ]
 
 
@@ -97,7 +86,7 @@ def test_smalld_calls_listener_on_payload(payload_type, expected_data, gateway_m
 
 def test_smalld_calls_event_listener_on_payload(gateway_mock):
     data = {"key", "value"}
-    payload = {"op": 0, "t": "CREATE_MESSAGE", "d": data}
+    payload = {"op": 0, "t": "CREATE_MESSAGE", "d": data, "s": 0}
     callback = Mock()
     smalld = SmallD("token")
     prepare_gateway_mock(gateway_mock, smalld, [[payload]])
