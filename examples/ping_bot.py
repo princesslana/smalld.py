@@ -1,4 +1,8 @@
+import logging
+
 from smalld import SmallD
+
+logging.basicConfig(level=logging.INFO)
 
 smalld = SmallD()
 
