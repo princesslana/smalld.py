@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+
 from smalld.gateway import Gateway
 from websocket import ABNF, WebSocketConnectionClosedException
 
