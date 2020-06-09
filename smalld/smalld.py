@@ -180,7 +180,10 @@ class Gateway:
                 raise GatewayClosedException.parse(data)
 
     def send(self, data):
-        self.ws.send(data)
+        try:
+            self.ws.send(data)
+        except WebSocketConnectionClosedException:
+            raise ConnectionError
 
     def close(self):
         self.ws.close()
