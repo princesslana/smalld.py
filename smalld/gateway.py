@@ -1,0 +1,38 @@
+import json
+
+from attrdict import AttrDict
+from websocket import ABNF, WebSocket, WebSocketConnectionClosedException
+
+from .exceptions import GatewayClosedException
+
+
+class Gateway:
+    def __init__(self, url):
+        self.url = url
+        self.ws = WebSocket()
+
+    def __iter__(self):
+
+        self.ws.connect(self.url)
+
+        while self.ws.connected:
+            try:
+                with self.ws.readlock:
+                    opcode, data = self.ws.recv_data()
+            except WebSocketConnectionClosedException:
+                return
+
+            if data and opcode == ABNF.OPCODE_TEXT:
+                decoded_data = data.decode("utf-8")
+                yield AttrDict(json.loads(decoded_data))
+            elif data and opcode == ABNF.OPCODE_CLOSE:
+                raise GatewayClosedException.parse(data)
+
+    def send(self, data):
+        try:
+            self.ws.send(data)
+        except WebSocketConnectionClosedException:
+            raise ConnectionError
+
+    def close(self):
+        self.ws.close()
