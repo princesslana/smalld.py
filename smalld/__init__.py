@@ -1,6 +1,5 @@
 from .exceptions import (
     ConnectionError,
-    GatewayClosedException,
     HttpError,
     RateLimitException,
     SmallDException,

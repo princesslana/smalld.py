@@ -12,7 +12,7 @@ from pkg_resources import get_distribution
 import requests
 from attrdict import AttrDict
 
-from .exceptions import ConnectionError, GatewayClosedException, HttpError
+from .exceptions import ConnectionError, HttpError
 from .gateway import Gateway
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
@@ -137,26 +137,24 @@ class SmallD:
 
         self.closed_event.clear()
 
-        while True:
+        while not self.closed:
             logger.info("Gateway connecting...")
             gateway_url = self.get("/gateway/bot").url
 
             self.gateway = Gateway(gateway_url)
 
-            try:
-                for data in self.gateway:
-                    logger.debug("gateway payload received: %s", data)
-                    for listener in self.listeners:
-                        listener(data)
-            except GatewayClosedException as e:
-                if e.code not in recoverable_error_codes:
-                    raise
+            for data in self.gateway:
+                logger.debug("gateway payload received: %s", data)
+                for listener in self.listeners:
+                    listener(data)
 
-            if self.closed_event.is_set():
-                break
+            if not self.gateway.close_reason.code in recoverable_error_codes:
+                logger.fatal("Gateway closed: %s", self.gateway.close_reason.reason)
+                self.close()
 
-            logger.info("Pausing before reconnect...")
-            time.sleep(5)
+            if not self.closed:
+                logger.info("Pausing before reconnect...")
+                time.sleep(5)
 
 
 class HttpClient:
