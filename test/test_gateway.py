@@ -1,7 +1,8 @@
 from unittest import mock
 
 import pytest
-from smalld.smalld import Gateway, GatewayClosedException
+from smalld.exceptions import GatewayClosedException
+from smalld.gateway import Gateway
 from websocket import ABNF, WebSocketConnectionClosedException
 
 CONNECTION_URL = "ws://example.url/"
@@ -9,7 +10,7 @@ CONNECTION_URL = "ws://example.url/"
 
 @pytest.fixture()
 def ws_mock():
-    with mock.patch("smalld.smalld.WebSocket", autospec=True) as ws_class_mock:
+    with mock.patch("smalld.gateway.WebSocket", autospec=True) as ws_class_mock:
         instance = ws_class_mock.return_value
         instance.readlock = mock.MagicMock()
         instance.connected = True
