@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 from smalld.smalld import Gateway, GatewayClosedException
-from websocket import ABNF
+from websocket import ABNF, WebSocketConnectionClosedException
 
 CONNECTION_URL = "ws://example.url/"
 
@@ -67,3 +67,12 @@ def test_gateway_closes_on_close_event(ws_mock):
 
     e = exc_info.value
     assert e.code == expected_code and e.reason == expected_reason
+
+
+def test_gateway_end_when_websocket_exception(ws_mock):
+    ws_mock.recv_data.side_effect = [WebSocketConnectionClosedException()]
+
+    gateway = Gateway(CONNECTION_URL)
+
+    for data in gateway:
+        pytest.fail("Should receive no data")

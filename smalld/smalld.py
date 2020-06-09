@@ -11,7 +11,7 @@ from pkg_resources import get_distribution
 
 import requests
 from attrdict import AttrDict
-from websocket import ABNF, WebSocket
+from websocket import ABNF, WebSocket, WebSocketConnectionClosedException
 
 from .exceptions import ConnectionError, GatewayClosedException, HttpError
 from .ratelimit import RateLimiter
@@ -167,8 +167,11 @@ class Gateway:
         self.ws.connect(self.url)
 
         while self.ws.connected:
-            with self.ws.readlock:
-                opcode, data = self.ws.recv_data()
+            try:
+                with self.ws.readlock:
+                    opcode, data = self.ws.recv_data()
+            except WebSocketConnectionClosedException:
+                return
 
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
