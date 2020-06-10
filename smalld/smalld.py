@@ -1,10 +1,8 @@
 import json
 import logging
-import operator
 import os
 import time
 from enum import Flag
-from functools import reduce
 from threading import Event
 
 from pkg_resources import get_distribution
@@ -42,7 +40,11 @@ class Intent(Flag):
 
     @staticmethod
     def all():
-        return reduce(operator.ior, Intent.__members__.values())
+        return ~Intent(0)
+
+    @staticmethod
+    def unprivileged():
+        return ~(Intent.GUILD_PRESENCES | Intent.GUILD_MEMBERS)
 
 
 recoverable_error_codes = {
@@ -61,7 +63,7 @@ class SmallD:
         self,
         token=os.environ.get("SMALLD_TOKEN"),
         base_url="https://discord.com/api/v6",
-        intents=Intent.all(),
+        intents=Intent.unprivileged(),
     ):
         if not token:
             raise ValueError("No bot token provided")
