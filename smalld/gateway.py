@@ -16,16 +16,16 @@ class CloseReason:
     def parse(data):
         code = int.from_bytes(data[:2], "big")
         reason = data[2:].decode("utf-8")
-        return GatewayClosedException(code, reason)
+        return CloseReason(code, reason)
 
 
 class Gateway:
     def __init__(self, url):
         self.url = url
         self.ws = WebSocket()
+        self.close_reason = None
 
     def __iter__(self):
-
         self.ws.connect(self.url)
 
         while self.ws.connected:
