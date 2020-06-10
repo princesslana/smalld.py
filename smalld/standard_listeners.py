@@ -3,6 +3,8 @@ import sys
 import time
 from threading import Event, Thread
 
+from .exceptions import ConnectionError
+
 logger = logging.getLogger("smalld")
 
 
@@ -127,8 +129,12 @@ class Heartbeat:
         interval = self.heartbeat_interval / 1000
         time.sleep(interval)
         while not self.smalld.closed:
-            self.send_heartbeat()
-            time.sleep(interval)
+            try:
+                self.send_heartbeat()
+            except ConnectionError:
+                continue
+            finally:
+                time.sleep(interval)
 
             if self.received_ack.is_set():
                 self.received_ack.clear()
