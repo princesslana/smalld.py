@@ -1,10 +1,8 @@
 import json
 import logging
-import operator
 import os
 import time
 from enum import Flag
-from functools import reduce
 from threading import Event
 
 from pkg_resources import get_distribution
