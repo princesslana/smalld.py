@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from smalld.exceptions import GatewayClosedException
 from smalld.gateway import Gateway
 from websocket import ABNF, WebSocketConnectionClosedException
 
@@ -62,12 +61,12 @@ def test_gateway_closes_on_close_event(ws_mock):
     ws_mock.recv_data.return_value = ABNF.OPCODE_CLOSE, b"\x00\x10Reason"
     gateway = Gateway(CONNECTION_URL)
 
-    it = iter(gateway)
-    with pytest.raises(GatewayClosedException) as exc_info:
-        next(it)
+    for data in gateway:
+        pytest.fail("No data should be emitted")
 
-    e = exc_info.value
-    assert e.code == expected_code and e.reason == expected_reason
+    assert gateway.close_reason
+    assert gateway.close_reason.code == expected_code
+    assert gateway.close_reason.reason == expected_reason
 
 
 def test_gateway_end_when_websocket_exception(ws_mock):

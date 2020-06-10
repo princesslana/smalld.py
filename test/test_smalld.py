@@ -2,10 +2,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 from attrdict import AttrDict
-from smalld.smalld import GatewayClosedException, SmallD, recoverable_error_codes
+from smalld.gateway import CloseReason
+from smalld.smalld import SmallD, recoverable_error_codes
 
 
-def prepare_gateway_mock(gateway_mock, smalld, side_effects=[()], auto_close=True):
+def prepare_gateway_mock(
+    gateway_mock, smalld, side_effects=[()], close_reason=None, auto_close=True
+):
     """Configures __iter__ for gateway.
 
     Each call to __iter__ is represented by an iterable in the side_effects list.
@@ -38,6 +41,9 @@ def prepare_gateway_mock(gateway_mock, smalld, side_effects=[()], auto_close=Tru
             ):
                 raise value
             yield AttrDict(value)
+
+        if close_reason:
+            gateway_mock.close_reason.return_value = CloseReason(*close_reason)
 
     gateway_mock.__iter__.side_effect = iter_gateway
 
@@ -97,25 +103,19 @@ def test_smalld_calls_event_listener_on_payload(gateway_mock):
     callback.assert_called_once_with(data)
 
 
-def test_smalld_raises_for_non_recoverable_gateway_errors(gateway_mock):
+def test_smalld_ends_for_non_recoverable_gateway_errors(gateway_mock):
     smalld = SmallD("token")
 
     assert -1 not in recoverable_error_codes  # sanity check
-    prepare_gateway_mock(gateway_mock, smalld, [[GatewayClosedException(-1, "reason")]])
+    prepare_gateway_mock(gateway_mock, smalld, close_reason=(-1, "reason"))
 
-    with pytest.raises(GatewayClosedException) as exc_info:
-        smalld.run()
-
-    e = exc_info.value
-    assert e.code == -1 and e.reason == "reason"
+    smalld.run()
 
 
 @pytest.mark.parametrize("code", list(recoverable_error_codes))
 def test_smalld_handles_recoverable_error(code, gateway_mock):
     smalld = SmallD("token")
-    prepare_gateway_mock(
-        gateway_mock, smalld, [[GatewayClosedException(code, "reason")]]
-    )
+    prepare_gateway_mock(gateway_mock, smalld, close_reason=(code, "reason"))
 
     smalld.run()  # doesn't raise
 
