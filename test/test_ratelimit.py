@@ -51,7 +51,7 @@ def test_resource_ratelimit_bucket(time):
     bucket.take()  # doesn't raise
     assert bucket.remaining == 0
 
-    with pytest.raises(RateLimitException) as exc_info:
+    with pytest.raises(RateLimitError) as exc_info:
         bucket.take()
 
     e = exc_info.value
@@ -69,7 +69,7 @@ def test_global_ratelimit_bucket(time):
 
     assert limit.is_ratelimited
 
-    with pytest.raises(RateLimitException) as exc_info:
+    with pytest.raises(RateLimitError) as exc_info:
         limit.take()
 
     e = exc_info.value
@@ -115,7 +115,7 @@ def test_ratelimit_raises_on_limit_exhausted_response(
 ):
     time.set_to(start)
     limiter = RateLimiter()
-    with pytest.raises(RateLimitException) as exc_info:
+    with pytest.raises(RateLimitError) as exc_info:
         limiter.on_response(*response)
 
     e = exc_info.value
@@ -130,7 +130,7 @@ def test_ratelimit_raises_on_request_exhausted_resource(time):
     ] = ResourceRateLimitBucket("abc123")
     bucket.update(make_ratelimit_headers("abc123", 10, 0, 1002, 2))
 
-    with pytest.raises(RateLimitException) as exc_info:
+    with pytest.raises(RateLimitError) as exc_info:
         limiter.on_request("GET", "path/to/resource")
 
     assert exc_info.value.reset == 1002
