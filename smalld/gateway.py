@@ -1,7 +1,12 @@
 import json
 
 from attrdict import AttrDict
-from websocket import ABNF, WebSocket, WebSocketException
+from websocket import (
+    ABNF,
+    WebSocket,
+    WebSocketConnectionClosedException,
+    WebSocketException,
+)
 
 
 class CloseReason:
