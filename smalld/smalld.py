@@ -42,7 +42,7 @@ class Intent(Flag):
 
     @staticmethod
     def all():
-        return reduce(operator.ior, Intent.__members__.values())
+        return ~Intent(0)
 
     @staticmethod
     def unprivileged():
