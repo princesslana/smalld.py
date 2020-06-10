@@ -46,6 +46,7 @@ class Intent(Flag):
 
 
 recoverable_error_codes = {
+    *range(1000, 1016),  # standard protocol error codes
     4000,  # unknown error
     4001,  # unknown opcode
     4002,  # decode error
