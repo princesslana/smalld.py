@@ -8,6 +8,8 @@ from websocket import (
     WebSocketException,
 )
 
+from .exceptions import NetworkError
+
 
 class CloseReason:
     def __init__(self, code, reason):
@@ -55,7 +57,7 @@ class Gateway:
         try:
             self.ws.send(data)
         except WebSocketConnectionClosedException:
-            raise ConnectionError
+            raise NetworkError
 
     def close(self):
         self.ws.close()

@@ -8,7 +8,7 @@ class HttpError(SmallDException):
         super().__init__(*args, **kwargs)
 
 
-class ConnectionError(SmallDException):
+class NetworkError(SmallDException):
     pass
 
 
