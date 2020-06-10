@@ -55,11 +55,6 @@ recoverable_error_codes = {
 }
 
 
-def recoverable_closure(gateway):
-    reason = gateway.close_reason
-    return reason and reason.code in recoverable_error_codes
-
-
 class SmallD:
     def __init__(
         self,
