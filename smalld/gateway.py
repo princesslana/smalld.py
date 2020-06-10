@@ -43,7 +43,6 @@ class Gateway:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
 
-
     def send(self, data):
         try:
             self.ws.send(data)

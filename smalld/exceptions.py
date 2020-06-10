@@ -1,6 +1,7 @@
 class SmallDException(Exception):
     pass
 
+
 class HttpError(SmallDException):
     def __init__(self, *args, response=None, **kwargs):
         self.response = response
