@@ -31,7 +31,7 @@ jobs:
       run: |
         pyenv local 3.6.9 3.7.4 3.8.0
         ./cc-test-reporter before-build
-        tox
+        tox --skip-missing-interpreters=false
         ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CODECLIMATE_REPORTER_ID }}

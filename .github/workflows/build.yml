@@ -26,4 +26,4 @@ jobs:
         pip install tox
     - name: Test with tox
       run: |
-        tox -e py
+        tox --skip-missing-interpreters=false -e py
