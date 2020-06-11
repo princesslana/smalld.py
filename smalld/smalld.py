@@ -136,7 +136,7 @@ class SmallD:
             self.close()
 
     def run(self):
-        logger.info("Running...")
+        logger.info("Running (SmallD v%s)...", __version__)
 
         self.closed_event.clear()
 
