@@ -8,11 +8,11 @@ class HttpError(SmallDException):
         super().__init__(*args, **kwargs)
 
 
-class ConnectionError(SmallDException):
+class NetworkError(SmallDException):
     pass
 
 
-class RateLimitException(SmallDException):
+class RateLimitError(SmallDException):
     def __init__(self, reset, *, is_global=False):
         super().__init__(f"rate limited until {reset}")
         self.reset = reset

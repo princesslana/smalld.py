@@ -3,7 +3,7 @@ import sys
 import time
 from threading import Event, Thread
 
-from .exceptions import ConnectionError
+from .exceptions import NetworkError
 
 logger = logging.getLogger("smalld")
 
@@ -131,7 +131,7 @@ class Heartbeat:
         while not self.smalld.closed:
             try:
                 self.send_heartbeat()
-            except ConnectionError:
+            except NetworkError:
                 continue
             finally:
                 time.sleep(interval)

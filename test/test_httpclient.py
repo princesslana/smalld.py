@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 import responses
-from smalld import ConnectionError, HttpError
+from smalld import HttpError, NetworkError
 from smalld.smalld import HttpClient
 
 
@@ -52,7 +52,7 @@ def test_httpclient_raises_for_non_2xx_status():
 def test_httpclient_raises_for_connection_errors():
     client = HttpClient("token", "https://domain.com")
 
-    with pytest.raises(ConnectionError):
+    with pytest.raises(NetworkError):
         client.get("path")
 
 

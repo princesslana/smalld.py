@@ -10,7 +10,7 @@ from pkg_resources import get_distribution
 import requests
 from attrdict import AttrDict
 
-from .exceptions import ConnectionError, HttpError
+from .exceptions import HttpError, NetworkError
 from .gateway import Gateway
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
@@ -209,7 +209,7 @@ class HttpClient:
         try:
             res = self.session.request(method, f"{self.base_url}/{path}", **args)
         except (requests.ConnectionError, requests.Timeout):
-            raise ConnectionError
+            raise NetworkError
         except requests.RequestException:
             raise HttpError
 

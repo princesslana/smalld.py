@@ -4,7 +4,7 @@ from math import ceil
 
 from pkg_resources import resource_string
 
-from .exceptions import RateLimitException
+from .exceptions import RateLimitError
 
 
 class NoRateLimitBucket:
@@ -27,7 +27,7 @@ class ResourceRateLimitBucket:
             and self.remaining <= 0
             and time.time() < self.reset
         ):
-            raise RateLimitException(self.reset)
+            raise RateLimitError(self.reset)
         self.remaining -= 1
 
     def update(self, values):
@@ -42,7 +42,7 @@ class GlobalRateLimitBucket:
 
     def take(self):
         if self.is_ratelimited and time.time() < self.reset:
-            raise RateLimitException(self.reset, is_global=True)
+            raise RateLimitError(self.reset, is_global=True)
 
     def update(self, values):
         self.is_ratelimited = (
@@ -77,9 +77,7 @@ class RateLimiter:
         bucket.update(headers)
 
         if status_code == 429:
-            raise RateLimitException(
-                bucket.reset, is_global=bucket is self.global_bucket
-            )
+            raise RateLimitError(bucket.reset, is_global=bucket is self.global_bucket)
 
     def get_bucket(self, method, path, bucket_id=None):
         resource = get_resource(path)
