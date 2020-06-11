@@ -1,5 +1,6 @@
 # SmallD.py
 
+[![PyPI version](https://badge.fury.io/py/smalld.svg)](https://badge.fury.io/py/smalld)
 ![Build](https://github.com/princesslana/smalld.py/workflows/Build/badge.svg?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7916cdfc83bf0fb95fa0/maintainability)](https://codeclimate.com/github/princesslana/smalld.py/maintainability)
 [![Discord](https://img.shields.io/discord/417389758470422538)](https://discord.gg/3aTVQtz)
