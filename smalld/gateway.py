@@ -4,6 +4,7 @@ from attrdict import AttrDict
 from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
+from .logger import logger
 
 WebSocketError = (WebSocketException, OSError)
 
@@ -49,6 +50,8 @@ class Gateway:
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
+
+        logger.info("Gateway Closed: %s", self.close_reason)
 
     def send(self, data):
         try:

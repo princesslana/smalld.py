@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import time
 from enum import Flag
@@ -12,11 +11,9 @@ from attrdict import AttrDict
 
 from .exceptions import HttpError, NetworkError
 from .gateway import Gateway
+from .logger import logger
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
-
-logger = logging.getLogger("smalld")
-
 
 __version__ = get_distribution("smalld").version
 
@@ -159,7 +156,6 @@ class SmallD:
                 self.close()
 
             if not self.closed:
-                logger.info("Pausing before reconnect...")
                 time.sleep(5)
 
 
