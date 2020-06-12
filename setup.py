@@ -27,6 +27,7 @@ setup(
         "requests>=2.23.0",
         "websocket_client>=0.57.0",
     ],
+    setup_requires=["setuptools-scm==3.3.3"],
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
