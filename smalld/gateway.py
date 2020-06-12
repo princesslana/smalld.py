@@ -9,6 +9,7 @@ from websocket import (
 )
 
 from .exceptions import NetworkError
+from .logger import logger
 
 
 class CloseReason:
@@ -52,6 +53,8 @@ class Gateway:
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
                 yield AttrDict(json.loads(decoded_data))
+
+        logger.info("Gateway Closed: %s", self.close_reason)
 
     def send(self, data):
         try:

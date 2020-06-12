@@ -1,11 +1,9 @@
-import logging
 import sys
 import time
 from threading import Event, Thread
 
 from .exceptions import NetworkError
-
-logger = logging.getLogger("smalld")
+from .logger import logger
 
 
 def add_standard_listeners(smalld):
@@ -61,11 +59,13 @@ class Identify:
             self.identify()
 
     def on_invalid_session(self, data):
+        logger.info("Invalid session.")
         self.session_id = None
         time.sleep(2)
         self.identify()
 
     def on_reconnect(self, data):
+        logger.info("Discord requested reconnect...")
         self.smalld.reconnect()
 
     def identify(self):
@@ -139,6 +139,7 @@ class Heartbeat:
             if self.received_ack.is_set():
                 self.received_ack.clear()
             else:
+                logger.info("No heartbeat ack. Reconnecting...")
                 self.smalld.reconnect()
                 break
 
