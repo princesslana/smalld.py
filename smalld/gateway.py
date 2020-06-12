@@ -1,14 +1,11 @@
 import json
 
 from attrdict import AttrDict
-from websocket import (
-    ABNF,
-    WebSocket,
-    WebSocketConnectionClosedException,
-    WebSocketException,
-)
+from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
+
+WebSocketError = (WebSocketException, OSError)
 
 
 class CloseReason:
@@ -35,14 +32,14 @@ class Gateway:
     def __iter__(self):
         try:
             self.ws.connect(self.url)
-        except WebSocketException:
-            raise ConnectionError
+        except WebSocketError:
+            raise NetworkError
 
         while self.ws.connected:
             try:
                 with self.ws.readlock:
                     opcode, data = self.ws.recv_data()
-            except WebSocketException:
+            except WebSocketError:
                 return
 
             if data and opcode == ABNF.OPCODE_CLOSE:
@@ -56,7 +53,7 @@ class Gateway:
     def send(self, data):
         try:
             self.ws.send(data)
-        except WebSocketConnectionClosedException:
+        except WebSocketError:
             raise NetworkError
 
     def close(self):
