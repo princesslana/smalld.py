@@ -11,7 +11,7 @@ from attrdict import AttrDict
 
 from .exceptions import HttpError, NetworkError
 from .gateway import Gateway
-from .logger import log_exception, logger
+from .logger import logger
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
@@ -132,7 +132,6 @@ class SmallD:
         if not self.closed:
             self.close()
 
-    @log_exception
     def run(self):
         logger.info("Running (SmallD v%s)...", __version__)
 
