@@ -149,13 +149,13 @@ An example of sending an attachment can be found in (examples/cat_bot.py).
 ### Errors
 
 ```python
-class SmallDException
-class HttpError(SmallDException)
-class NetworkError(SmallDException)
-class RateLimitError(SmallDException)
+class SmallDError(Exception)
+class HttpError(SmallDError)
+class NetworkError(SmallDError)
+class RateLimitError(SmallDError)
 ```
 
-`SmallDException` is used as a base class for all errors raised by SmallD.
+`SmallDError` is used as a base class for all errors raised by SmallD.
 
 `HttpError` is raised when a non-2xx response is returned from a resources.
 The response that caused the error can be accessed via the `response` attribute.
