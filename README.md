@@ -126,22 +126,44 @@ for MESSAGE_REACTION_ADD events, etc.
 ### Resources
 
 ```python
-SmallD.get(path)
-SmallD.post(path, payload="", attachments=None)
-SmallD.put(path, payload="")
-SmallD.patch(path, payload="")
-SmallD.delete(path)
+SmallD.<http method>(path, payload="", attachments=None, parameters=None)
+
+SmallD.get(...)
+SmallD.post(...)
+SmallD.put(...)
+SmallD.patch(...)
+SmallD.delete(...)
 ```
 
 These methods send a request to a discord resource and returns the response.
+All methods support the same parameters.
 The payload is serialized to JSON before being sent.
 SmallD manages Discord's rate limits, throwing an exception if the rate limit would
 be broken. Also raises an exception on any non-2xx response.
 
-Attachments can be provided to the `post` method as a list of tuples.
+Attachments can be provided as a list of tuples.
 Each tuple should be (file name, content, mime-type).
 The file name and mime-type should be strings, with content being a file-like object.
 An example of sending an attachment can be found in (examples/cat_bot.py).
+
+### Errors
+
+```python
+class SmallDException
+class HttpError(SmallDException)
+class NetworkError(SmallDException)
+class RateLimitError(SmallDException)
+```
+
+`SmallDException` is used as a base class for all errors raised by SmallD.
+
+`HttpError` is raised when a non-2xx response is returned from a resources.
+The response that caused the error can be accessed via the `response` attribute.
+
+`NetworkError` is raised when there is a connectivity or other network related error.
+
+`RateLimitError` is raised when hitting a Discord imposed rate limit. 
+The reset time of this rate limit (i.e., when the rate limit will no longer apply) is available in the `reset` attribute.
 
 ## Contact
 
