@@ -1,2 +1,2 @@
-from .exceptions import HttpError, NetworkError, RateLimitError, SmallDException
+from .exceptions import HttpError, NetworkError, RateLimitError, SmallDError
 from .smalld import Intent, SmallD, __version__

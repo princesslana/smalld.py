@@ -63,7 +63,7 @@ class SmallD:
         intents=Intent.unprivileged(),
     ):
         if not token:
-            raise ValueError("No bot token provided")
+            raise SmallDError("No bot token provided")
 
         self.token = token
         self.base_url = base_url
