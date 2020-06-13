@@ -141,7 +141,7 @@ for MESSAGE_REACTION_ADD events, etc.
 ### Resources
 
 ```python
-SmallD.<http method>(path, payload="", attachments=None, parameters=None)
+SmallD.<http method>(path, payload="", attachments=None, params=None)
 
 SmallD.get(...)
 SmallD.post(...)
@@ -150,16 +150,21 @@ SmallD.patch(...)
 SmallD.delete(...)
 ```
 
-These methods send a request to a discord resource and returns the response.
+These methods send a request to a discord resource and return the response.
 All methods support the same parameters.
-The payload is serialized to JSON before being sent.
 SmallD manages Discord's rate limits, throwing an exception if the rate limit would
-be broken. Also raises an exception on any non-2xx response.
+be broken. An exception is raised on any non-2xx response.
+
+The payload is serialized to JSON before being sent.
+Typically `payload` will be passed in as a `dict` that matches the data expected
+by the Discord API.
 
 Attachments can be provided as a list of tuples.
 Each tuple should be (file name, content, mime-type).
 The file name and mime-type should be strings, with content being a file-like object.
 An example of sending an attachment can be found in (examples/cat_bot.py).
+
+Query parameters to be set on the request can be passed in `params`.
 
 ### Errors
 
