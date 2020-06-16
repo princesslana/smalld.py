@@ -55,6 +55,13 @@ recoverable_error_codes = {
 }
 
 
+def is_recoverable_error(reason):
+    if not reason or not reason.code:
+        return True
+
+    return reason.code in recoverable_error_codes
+
+
 class SmallD:
     def __init__(
         self,
@@ -148,8 +155,7 @@ class SmallD:
                 for listener in self.listeners:
                     listener(data)
 
-            reason = self.gateway.close_reason
-            if reason and not reason.code in recoverable_error_codes:
+            if not is_recoverable_error(self.gateway.close_reason):
                 logger.fatal(
                     "Unrecoverable gateway closure: %s", self.gateway.close_reason
                 )
