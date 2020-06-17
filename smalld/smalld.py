@@ -18,6 +18,9 @@ from .standard_listeners import add_standard_listeners
 __version__ = get_distribution("smalld").version
 
 
+MIN_SECONDS_BETWEEN_CONNECTIONS = 120
+
+
 class Intent(Flag):
     GUILDS = 1 << 0
     GUILD_MEMBERS = 1 << 1
@@ -146,23 +149,37 @@ class SmallD:
 
         while not self.closed:
             logger.info("Gateway connecting...")
-            gateway_url = self.get("/gateway/bot").url
+            connection_time = int(time.monotonic())
 
-            self.gateway = Gateway(gateway_url)
+            try:
+                gateway_url = self.get("/gateway/bot").url
+            except (HttpError, NetworkError) as e:
+                logger.info(f"Could not fetch gateway url. ({type(e).__name__}) {e}")
+            else:
+                self.gateway = Gateway(gateway_url)
 
-            for data in self.gateway:
-                logger.debug("gateway payload received: %s", data)
-                for listener in self.listeners:
-                    listener(data)
+                for data in self.gateway:
+                    logger.debug("gateway payload received: %s", data)
+                    self.notify_listeners(data)
 
-            if not is_recoverable_error(self.gateway.close_reason):
-                logger.fatal(
-                    "Unrecoverable gateway closure: %s", self.gateway.close_reason
-                )
-                self.close()
+                if not is_recoverable_error(self.gateway.close_reason):
+                    logger.fatal(
+                        "Unrecoverable gateway closure: %s", self.gateway.close_reason
+                    )
+                    self.close()
 
             if not self.closed:
-                time.sleep(5)
+                since_last_connection = int(time.monotonic()) - connection_time
+                time.sleep(
+                    max(5, MIN_SECONDS_BETWEEN_CONNECTIONS - since_last_connection)
+                )
+
+    def notify_listeners(self, data):
+        try:
+            for listener in self.listeners:
+                listener(data)
+        except:
+            logger.warn("Exception in listener", exc_info=True)
 
 
 class HttpClient:
