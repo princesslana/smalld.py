@@ -5,6 +5,7 @@ from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
 from .logger import logger
+from .ratelimit import GatewayRateLimiter
 
 WebSocketError = (WebSocketException, OSError)
 
@@ -33,6 +34,7 @@ class Gateway:
         self.url = url
         self.ws = WebSocket()
         self.close_reason = None
+        self.limiter = GatewayRateLimiter()
 
     def __iter__(self):
         try:
@@ -45,7 +47,7 @@ class Gateway:
                 with self.ws.readlock:
                     opcode, data = self.ws.recv_data()
             except WebSocketError as e:
-                logger.debug("Exception receving gateway data.", exc_info=True)
+                logger.debug("Exception receiving gateway data.", exc_info=True)
                 self.close_reason = CloseReason.exception(e)
                 break
 
@@ -60,6 +62,7 @@ class Gateway:
         logger.info("Gateway Closed: %s", self.close_reason)
 
     def send(self, data):
+        self.limiter.on_send()
         try:
             self.ws.send(data)
         except WebSocketError:
