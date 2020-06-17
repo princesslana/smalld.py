@@ -1,5 +1,6 @@
 import re
 import time
+from collections import deque
 from math import ceil
 
 from pkg_resources import resource_string
@@ -98,6 +99,23 @@ class RateLimiter:
             bucket = self.buckets[bucket_id] = ResourceRateLimitBucket(bucket_id)
         self.resource_buckets[key] = bucket
         return bucket
+
+
+class GatewayRateLimiter:
+    MAX_EVENTS = 120
+    RESET_INTERVAL = 60
+
+    def __init__(self):
+        self.window = deque(maxlen=self.MAX_EVENTS)
+
+    def on_send(self):
+        current_time = time.time()
+        if (
+            len(self.window) == self.MAX_EVENTS
+            and current_time - self.window[0] < self.RESET_INTERVAL
+        ):
+            raise RateLimitError(self.window[0] + self.RESET_INTERVAL)
+        self.window.append(current_time)
 
 
 def extract_patterns(mappings):

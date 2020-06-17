@@ -155,3 +155,26 @@ def test_ratelimit_raises_on_request_exhausted_resource(time):
 )
 def test_get_resource(path, resource):
     assert get_resource(path) == resource
+
+
+def exhausted_gateway_limiter():
+    limiter = GatewayRateLimiter()
+    for _ in range(limiter.MAX_EVENTS):
+        limiter.on_send()
+    return limiter
+
+
+def test_gateway_ratelimiter_raises_on_exhausted_limit(time):
+    limiter = exhausted_gateway_limiter()
+
+    with pytest.raises(RateLimitError) as exc_info:
+        limiter.on_send()
+
+    assert exc_info.value.reset == limiter.RESET_INTERVAL
+
+
+def test_gateway_ratelimiter_resets_after_interval(time):
+    limiter = exhausted_gateway_limiter()
+    time.set_to(limiter.RESET_INTERVAL)
+
+    limiter.on_send()  # doesn't raise
