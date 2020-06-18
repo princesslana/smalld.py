@@ -1,8 +1,8 @@
 from unittest.mock import Mock, patch
 
 import pytest
-from attrdict import AttrDict
 from smalld.gateway import CloseReason
+from smalld.jsonobject import JsonObject
 from smalld.smalld import SmallD, recoverable_error_codes
 
 
@@ -40,7 +40,7 @@ def prepare_gateway_mock(
                 and issubclass(value, BaseException)
             ):
                 raise value
-            yield AttrDict(value)
+            yield JsonObject(value)
 
         if close_reason:
             gateway_mock.close_reason.return_value = CloseReason(*close_reason)
@@ -59,7 +59,7 @@ def client_mock():
     with patch("smalld.smalld.HttpClient", autospec=True) as client_cls:
         instance = client_cls.return_value
         # for get gateway request
-        instance.get.return_value = AttrDict({"url": "url/to/gateway"})
+        instance.get.return_value = JsonObject({"url": "url/to/gateway"})
         yield instance
 
 

@@ -28,7 +28,7 @@ def test_gateway_connects_on_iteration(ws_mock):
     ws_mock.connect.assert_called_once_with(CONNECTION_URL)
 
 
-def test_gateway_yields_decoded_attrdict(ws_mock):
+def test_gateway_yields_decoded_json_objects(ws_mock):
     test_inputs = [(ABNF.OPCODE_TEXT, b"{}"), (ABNF.OPCODE_TEXT, b'{"key": "value"}')]
     expected_results = [{}, {"key": "value"}]
     ws_mock.recv_data.side_effect = test_inputs

@@ -7,10 +7,10 @@ from threading import Event
 from pkg_resources import get_distribution
 
 import requests
-from attrdict import AttrDict
 
 from .exceptions import HttpError, NetworkError
 from .gateway import Gateway
+from .jsonobject import JsonObject
 from .logger import logger
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
@@ -119,9 +119,8 @@ class SmallD:
         return decorator
 
     def send_gateway_payload(self, data):
-        payload = json.dumps(data)
-        logger.debug("gateway payload sent: %s", payload)
-        self.gateway.send(payload)
+        logger.debug("gateway payload sent: %s", data)
+        self.gateway.send(data)
 
     @property
     def closed(self):
@@ -242,7 +241,7 @@ class HttpClient:
         except json.JSONDecodeError:
             raise HttpError(response=res)
 
-        return AttrDict(content)
+        return JsonObject(content)
 
     def close(self):
         self.session.close()
