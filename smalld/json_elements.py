@@ -33,7 +33,7 @@ class JsonObject(abc.Mapping):
             ) from None
 
     def __repr__(self):
-        return repr(self.__data)
+        return f"<JsonObject {self.__data}>"
 
 
 class JsonArray(abc.Sequence):
@@ -49,4 +49,4 @@ class JsonArray(abc.Sequence):
         return len(self.__data)
 
     def __repr__(self):
-        return repr(self.__data)
+        return f"<JsonArray {self.__data}>"
