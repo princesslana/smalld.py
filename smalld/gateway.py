@@ -1,9 +1,9 @@
 import json
 
-from attrdict import AttrDict
 from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
+from .json_elements import JsonObject
 from .logger import logger
 from .ratelimit import GatewayRateLimiter
 
@@ -57,14 +57,15 @@ class Gateway:
 
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
-                yield AttrDict(json.loads(decoded_data))
+                yield JsonObject(json.loads(decoded_data))
 
         logger.info("Gateway Closed: %s", self.close_reason)
 
     def send(self, data):
         self.limiter.on_send()
+        payload = json.dumps(data)
         try:
-            self.ws.send(data)
+            self.ws.send(payload)
         except WebSocketError:
             raise NetworkError
 

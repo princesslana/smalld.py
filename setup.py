@@ -22,11 +22,7 @@ setup(
     packages=["smalld", "smalld.resources"],
     package_data={"smalld.resources": ["*"]},
     use_scm_version=True,
-    install_requires=[
-        "attrdict>=2.0.1",
-        "requests>=2.23.0",
-        "websocket_client>=0.57.0",
-    ],
+    install_requires=["requests>=2.23.0", "websocket_client>=0.57.0"],
     setup_requires=["setuptools-scm==3.3.3"],
     classifiers=[
         "Development Status :: 4 - Beta",
