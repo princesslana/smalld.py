@@ -10,7 +10,7 @@ import requests
 
 from .exceptions import HttpError, NetworkError
 from .gateway import Gateway
-from .jsonobject import JsonObject
+from .json_elements import JsonObject
 from .logger import logger
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners

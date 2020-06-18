@@ -10,7 +10,7 @@ def wrap_value(value):
 
 
 class JsonObject(abc.Mapping):
-    __slots__ = "__data",
+    __slots__ = ("__data",)
 
     def __init__(self, data):
         self.__data = data
@@ -37,11 +37,11 @@ class JsonObject(abc.Mapping):
 
 
 class JsonArray(abc.Sequence):
-    __slots__ = "__data",
+    __slots__ = ("__data",)
 
     def __init__(self, data):
         self.__data = data
-    
+
     def __getitem__(self, index):
         return wrap_value(self.__data[index])
 

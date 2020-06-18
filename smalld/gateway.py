@@ -3,7 +3,7 @@ import json
 from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
-from .jsonobject import JsonObject
+from .json_elements import JsonObject
 from .logger import logger
 from .ratelimit import GatewayRateLimiter
 

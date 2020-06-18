@@ -2,7 +2,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from smalld.gateway import CloseReason
-from smalld.jsonobject import JsonObject
+from smalld.json_elements import JsonObject
 from smalld.smalld import SmallD, recoverable_error_codes
 
 
