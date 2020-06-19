@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - uses: actions/cache@v2
+      with:
+        path: /opt/hostedtoolcache/pyenv_root/
+        key: coverage-pyenv-${{ hashFiles('.python-version') }}
+        restore-keys: coverage-pyenv-
     - name: Install pyenv dependencies
       run: > 
         sudo apt-get update &&
