@@ -108,7 +108,7 @@ class SmallD:
     def on_gateway_payload(self, op=None, t=None):
         def decorator(f):
             def filtered_payload_listener(data):
-                if op and data.op != op:
+                if op is not None and data.op != op:
                     return
 
                 if t and data.t != t:
