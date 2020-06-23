@@ -106,12 +106,14 @@ smalld.SmallD(
     token=os.environ.get("SMALLD_TOKEN"),
     base_url="https://discord.com/api/v6",
     intents=Intent.all(),
+    shard=(0, 1),
 )
 ```
 
 Creates a SmallD instance using the provided configuration.
 Intents are passed in using the `|` operator, for example
 `Intent.GUILD_MESSAGES | Intent.DIRECT_MESSAGES`.
+The `shard` configuration should be a tuple of (current shard, number of shards).
 
 ### Running
 
