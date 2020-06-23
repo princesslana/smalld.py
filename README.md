@@ -138,6 +138,12 @@ you wish to listen for.
 For example `on_message_create` for MESSAGE_CREATE events, `on_message_reaction_add`
 for MESSAGE_REACTION_ADD events, etc.
 
+```python
+SmallD.send_gateway_payload(data)
+```
+
+To send data to the Discord gateway use the `send_gateway_payload` method.
+
 ### Resources
 
 ```python
