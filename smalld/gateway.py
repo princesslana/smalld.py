@@ -57,6 +57,7 @@ class Gateway:
 
             if data and opcode == ABNF.OPCODE_TEXT:
                 decoded_data = data.decode("utf-8")
+                logger.debug("Gateway payload received: %s", decoded_data)
                 yield JsonObject(json.loads(decoded_data))
 
         logger.info("Gateway Closed: %s", self.close_reason)
@@ -64,9 +65,11 @@ class Gateway:
     def send(self, data):
         self.limiter.on_send()
         payload = json.dumps(data)
+        logger.debug("Gateway payload sent: %s", payload)
         try:
             self.ws.send(payload)
         except WebSocketError:
+            logger.debug("Error sending payload.", exc_info=True)
             raise NetworkError
 
     def close(self):

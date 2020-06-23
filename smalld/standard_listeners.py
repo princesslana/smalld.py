@@ -82,6 +82,7 @@ class Identify:
                     },
                     "compress": False,
                     "intents": self.smalld.intents.value,
+                    "shard": self.smalld.shard,
                 },
             }
         )

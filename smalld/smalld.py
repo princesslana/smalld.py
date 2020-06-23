@@ -71,6 +71,7 @@ class SmallD:
         token=os.environ.get("SMALLD_TOKEN"),
         base_url="https://discord.com/api/v6",
         intents=Intent.unprivileged(),
+        shard=(0, 1),
     ):
         if not token:
             raise SmallDError("No bot token provided")
@@ -78,11 +79,12 @@ class SmallD:
         self.token = token
         self.base_url = base_url
         self.intents = intents
+        self.shard = shard
+
         self.listeners = []
         self.closed_event = Event()
 
         self.http = HttpClient(token, base_url)
-
         self.get = self.http.get
         self.post = self.http.post
         self.put = self.http.put
@@ -119,7 +121,6 @@ class SmallD:
         return decorator
 
     def send_gateway_payload(self, data):
-        logger.debug("gateway payload sent: %s", data)
         self.gateway.send(data)
 
     @property
@@ -158,7 +159,6 @@ class SmallD:
                 self.gateway = Gateway(gateway_url)
 
                 for data in self.gateway:
-                    logger.debug("gateway payload received: %s", data)
                     self.notify_listeners(data)
 
                 if not is_recoverable_error(self.gateway.close_reason):
