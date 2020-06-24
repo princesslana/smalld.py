@@ -114,7 +114,7 @@ class Heartbeat:
         smalld.on_gateway_payload(op=OP_HEARTBEAT_ACK)(self.on_heartbeat_ack)
 
     def on_hello(self, data):
-        self.heartbeat_interval = data.d.heartbeat_interval
+        self.heartbeat_interval = data.d.heartbeat_interval / 1000
 
         if not self.thread or not self.thread.is_alive():
             self.thread = Thread(target=self.run_heartbeat_loop)
@@ -127,15 +127,14 @@ class Heartbeat:
         self.received_ack.set()
 
     def run_heartbeat_loop(self):
-        interval = self.heartbeat_interval / 1000
-        time.sleep(interval)
+        time.sleep(self.heartbeat_interval)
         while not self.smalld.closed:
             try:
                 self.send_heartbeat()
             except NetworkError:
                 continue
             finally:
-                time.sleep(interval)
+                time.sleep(self.heartbeat_interval)
 
             if self.received_ack.is_set():
                 self.received_ack.clear()
