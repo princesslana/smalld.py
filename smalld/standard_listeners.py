@@ -26,7 +26,7 @@ class SequenceNumber:
         self.smalld = smalld
         self.number = None
 
-        smalld.on_gateway_payload()(self.on_payload)
+        smalld.on_gateway_payload(self.on_payload)
 
     def on_payload(self, data):
         if data.s:
@@ -39,11 +39,11 @@ class Identify:
         self.sequence = sequence
         self.session_id = None
 
-        smalld.on_ready()(self.on_ready)
-        smalld.on_resumed()(self.on_resumed)
-        smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
-        smalld.on_gateway_payload(op=OP_INVALID_SESSION)(self.on_invalid_session)
-        smalld.on_gateway_payload(op=OP_RECONNECT)(self.on_reconnect)
+        smalld.on_ready(self.on_ready)
+        smalld.on_resumed(self.on_resumed)
+        smalld.on_gateway_payload(self.on_hello, op=OP_HELLO)
+        smalld.on_gateway_payload(self.on_invalid_session, op=OP_INVALID_SESSION)
+        smalld.on_gateway_payload(self.on_reconnect, op=OP_RECONNECT)
 
     def on_ready(self, data):
         logger.info("Ready.")
@@ -109,9 +109,9 @@ class Heartbeat:
         self.heartbeat_interval = None
         self.received_ack = Event()
 
-        smalld.on_gateway_payload(op=OP_HELLO)(self.on_hello)
-        smalld.on_gateway_payload(op=OP_HEARTBEAT)(self.on_heartbeat)
-        smalld.on_gateway_payload(op=OP_HEARTBEAT_ACK)(self.on_heartbeat_ack)
+        smalld.on_gateway_payload(self.on_hello, op=OP_HELLO)
+        smalld.on_gateway_payload(self.on_heartbeat, op=OP_HEARTBEAT)
+        smalld.on_gateway_payload(self.on_heartbeat_ack, op=OP_HEARTBEAT_ACK)
 
     def on_hello(self, data):
         self.heartbeat_interval = data.d.heartbeat_interval / 1000

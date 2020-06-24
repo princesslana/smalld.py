@@ -97,7 +97,7 @@ def test_smalld_calls_event_listener_on_payload(gateway_mock):
     smalld = SmallD("token")
     prepare_gateway_mock(gateway_mock, smalld, [[payload]])
 
-    smalld.on_create_message()(callback)
+    smalld.on_create_message(callback)
     smalld.run()
 
     callback.assert_called_once_with(data)

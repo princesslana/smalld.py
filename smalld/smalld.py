@@ -95,17 +95,19 @@ class SmallD:
 
     def __getattr__(self, name):
         if name.startswith("on_"):
-            return lambda: self.on_dispatch(t=name.strip("on_").upper())
+            return self.on_dispatch(t=name.strip("on_").upper())
 
         super().__getattr__(name)
 
-    def on_dispatch(self, t):
+    def on_dispatch(self, func=None, *, t=None):
         def decorator(f):
-            self.on_gateway_payload(op=0, t=t)(lambda payload: f(payload.d))
+            self.on_gateway_payload(lambda payload: f(payload.d), op=0, t=t)
 
-        return decorator
+        if func is None:
+            return decorator
+        decorator(func)
 
-    def on_gateway_payload(self, op=None, t=None):
+    def on_gateway_payload(self, func=None, *, op=None, t=None):
         def decorator(f):
             def filtered_payload_listener(data):
                 if op is not None and data.op != op:
@@ -118,7 +120,9 @@ class SmallD:
 
             self.listeners.append(filtered_payload_listener)
 
-        return decorator
+        if func is None:
+            return decorator
+        decorator(func)
 
     def send_gateway_payload(self, data):
         self.gateway.send(data)
