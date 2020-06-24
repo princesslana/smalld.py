@@ -8,7 +8,7 @@ smalld = SmallD()
 CAT_API = "http://aws.random.cat/meow"
 
 
-@smalld.on_message_create()
+@smalld.on_message_create
 def on_message(msg):
     if msg.content == "++cat":
         cat_url = requests.get(CAT_API).json()["file"]
