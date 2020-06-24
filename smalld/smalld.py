@@ -102,10 +102,9 @@ class SmallD:
     def on_dispatch(self, func=None, *, t=None):
         def decorator(f):
             self.on_gateway_payload(lambda payload: f(payload.d), op=0, t=t)
+            return f
 
-        if func is None:
-            return decorator
-        decorator(func)
+        return decorator if func is None else decorator(func)
 
     def on_gateway_payload(self, func=None, *, op=None, t=None):
         def decorator(f):
@@ -119,10 +118,9 @@ class SmallD:
                 f(data)
 
             self.listeners.append(filtered_payload_listener)
+            return f
 
-        if func is None:
-            return decorator
-        decorator(func)
+        return decorator if func is None else decorator(func)
 
     def send_gateway_payload(self, data):
         self.gateway.send(data)
