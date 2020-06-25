@@ -56,7 +56,7 @@ We do  receive events by using a decorator on a function.
 We can use different decorators based upon what events we want to list.
 
 ```python
-@smalld.on_message_create()
+@smalld.on_message_create
 def on_message(msg):
     pass
 ```
@@ -71,7 +71,7 @@ Since we are replaying to the message that was sent, we can get the channel id b
 
 
 ```python
-@smalld.on_message_create()
+@smalld.on_message_create
 def on_message(msg):
     if msg.content == "++ping":
         smalld.post(f"/channels/{msg.channel_id}/messages", {"content": "pong"})
@@ -128,7 +128,9 @@ It will handle heartbeats and reconnections as necessary.
 
 ```python
 @SmallD.on_*
+SmallD.on_*(func=None)
 @SmallD.on_gateway_payload(op=None, t=None)
+SmallD.on_gateway_payload(func=None, *, op=None, t=None)
 ```
 
 To listen to events from the Discord gateway use decorators that start with `on_`.
