@@ -95,7 +95,7 @@ class SmallD:
 
     def __getattr__(self, name):
         if name.startswith("on_"):
-            return self.on_dispatch(t=name.strip("on_").upper())
+            return lambda func=None: self.on_dispatch(func, t=name.strip("on_").upper())
 
         super().__getattr__(name)
 
