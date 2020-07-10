@@ -8,7 +8,7 @@ from pkg_resources import get_distribution
 
 import requests
 
-from .exceptions import HttpError, NetworkError
+from .exceptions import HttpError, NetworkError, SmallDError
 from .gateway import Gateway
 from .json_elements import JsonObject
 from .logger import logger

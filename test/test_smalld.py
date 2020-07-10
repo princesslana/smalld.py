@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
 
 import pytest
+from smalld.exceptions import SmallDError
 from smalld.gateway import CloseReason
 from smalld.json_elements import JsonObject
 from smalld.smalld import SmallD, recoverable_error_codes
@@ -67,6 +68,11 @@ def client_mock():
 def sleep_mock():
     with patch("time.sleep") as sleep_mock:
         yield sleep_mock
+
+
+def test_smalld_raises_when_no_token_provided():
+    with pytest.raises(SmallDError):
+        smalld = SmallD()
 
 
 test_data = [
