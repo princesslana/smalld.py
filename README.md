@@ -226,6 +226,6 @@ $ tox -e run -- examples/ping_bot.py
 
 ## Usages
 
-* Tweenie: Add reacts to messages using the power of NLP.
-* SmallD-Click: Turn your Click CLI applications into discord bots using SmallD.
-* Converse: Anonymous (nameless) chat on discord.
+* [Tweenie](https://github.com/princesslana/tweenie): Add reacts to messages using the power of NLP.
+* [SmallD-Click](https://github.com/aymanizz/smalld-click): A command dispatcher for your discord bot combining Click and SmallD.
+* [Converse](https://github.com/aymanizz/converse): Anonymous (nameless) chat on discord.
