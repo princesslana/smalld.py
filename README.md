@@ -21,6 +21,7 @@ SmallD aims to be a minmalist client for the Discord API. It aims to let you use
   * [Contact](#contact)
   * [Contributing](#contributing)
      * [Developing](#developing)
+  * [Usages](#usages)
 
 ## Installing
 
@@ -223,3 +224,13 @@ To run examples, ping_bot in this case:
 $ tox -e run -- examples/ping_bot.py
 ```
 
+## Usages
+
+* [Tsktsk](https://github.com/ianagbip1oti/tsktsk):
+  A task list aimed at helping prioritize and categorize your tasks.
+* [Tweenie](https://github.com/princesslana/tweenie):
+  Add reacts to messages using the power of NLP.
+* [SmallD-Click](https://github.com/aymanizz/smalld-click):
+  A command dispatcher for your discord bot combining Click and SmallD.
+* [Converse](https://github.com/aymanizz/converse):
+  Anonymous (nameless) chat on discord.
