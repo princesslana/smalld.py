@@ -223,3 +223,8 @@ To run examples, ping_bot in this case:
 $ tox -e run -- examples/ping_bot.py
 ```
 
+## Usages
+
+* Tweenie: Add reacts to messages using the power of NLP.
+* SmallD-Click: Turn your Click CLI applications into discord bots using SmallD.
+* Converse: Anonymous (nameless) chat on discord.
