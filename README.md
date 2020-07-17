@@ -21,6 +21,7 @@ SmallD aims to be a minmalist client for the Discord API. It aims to let you use
   * [Contact](#contact)
   * [Contributing](#contributing)
      * [Developing](#developing)
+  * [Usages](#usages)
 
 ## Installing
 
