@@ -130,12 +130,12 @@ class SmallD:
         return self.closed_event.is_set()
 
     def reconnect(self):
-        self.gateway.close()
+        self.gateway.close(status=4900)
 
     def close(self):
         self.closed_event.set()
         self.http.close()
-        self.reconnect()
+        self.gateway.close()
 
     def __enter__(self):
         return self
@@ -170,6 +170,7 @@ class SmallD:
                     self.close()
 
             if not self.closed:
+                logger.debug("Waiting to reconnect...")
                 since_last_connection = int(time.monotonic()) - connection_time
                 time.sleep(
                     max(5, MIN_SECONDS_BETWEEN_CONNECTIONS - since_last_connection)

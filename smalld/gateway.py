@@ -72,5 +72,5 @@ class Gateway:
             logger.debug("Error sending payload.", exc_info=True)
             raise NetworkError
 
-    def close(self):
-        self.ws.close()
+    def close(self, status=1000):
+        self.ws.close(status=status)
