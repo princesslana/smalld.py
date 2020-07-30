@@ -4,7 +4,7 @@ from websocket import ABNF, WebSocket, WebSocketException
 
 from .exceptions import NetworkError
 from .json_elements import JsonObject
-from .logger import logger
+from .logger import logger, suppress_logging
 from .ratelimit import GatewayRateLimiter
 
 WebSocketError = (WebSocketException, OSError)
@@ -72,5 +72,8 @@ class Gateway:
             logger.debug("Error sending payload.", exc_info=True)
             raise NetworkError
 
-    def close(self):
-        self.ws.close()
+    def close(self, status=1000):
+        # An error is output be websocket-client for non-1000 statuses.
+        # During normal operation we use non-1000 statuses and don't want an error logged.
+        with suppress_logging("websocket"):
+            self.ws.close(status=status)
