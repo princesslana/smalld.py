@@ -55,6 +55,7 @@ recoverable_error_codes = {
     4005,  # already authenticated
     4007,  # invalid sequence
     4009,  # session timed out
+    4900,  # send when reconnecting
 }
 
 
