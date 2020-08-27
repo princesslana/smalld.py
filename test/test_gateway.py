@@ -28,6 +28,20 @@ def test_gateway_connects_on_iteration(ws_mock):
     ws_mock.connect.assert_called_once_with(CONNECTION_URL)
 
 
+def test_gateway_closes_when_connect_errors(ws_mock):
+    ws_mock.connected = False
+    ws_mock.connect.side_effect = [WebSocketException()]
+    gateway = Gateway(CONNECTION_URL)
+
+    for data in gateway:
+        pytest.fail("No data should be emitted")
+
+    ws_mock.connect.assert_called_once()
+    ws_mock.recv_data.assert_not_called()
+    assert gateway.close_reason
+    assert WebSocketException.__name__ in gateway.close_reason.reason
+
+
 def test_gateway_yields_decoded_json_objects(ws_mock):
     test_inputs = [(ABNF.OPCODE_TEXT, b"{}"), (ABNF.OPCODE_TEXT, b'{"key": "value"}')]
     expected_results = [{}, {"key": "value"}]

@@ -39,8 +39,9 @@ class Gateway:
     def __iter__(self):
         try:
             self.ws.connect(self.url)
-        except WebSocketError:
-            raise NetworkError
+        except WebSocketError as e:
+            logger.debug("Exception connecting to gateway.", exc_info=True)
+            self.close_reason = CloseReason.exception(e)
 
         while self.ws.connected:
             try:
