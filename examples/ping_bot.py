@@ -1,6 +1,6 @@
 from smalld import SmallD
 
-smalld = SmallD()
+smalld = SmallD.v8()
 
 
 @smalld.on_message_create

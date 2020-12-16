@@ -66,11 +66,15 @@ def is_recoverable_error(reason):
     return reason.code in recoverable_error_codes
 
 
+V6_BASE_URL = "https://discord.com/api/v6"
+V8_BASE_URL = "https://discord.com/api/v8"
+
+
 class SmallD:
     def __init__(
         self,
         token=os.environ.get("SMALLD_TOKEN"),
-        base_url="https://discord.com/api/v6",
+        base_url=V8_BASE_URL,
         intents=Intent.unprivileged(),
         shard=(0, 1),
     ):
@@ -93,6 +97,14 @@ class SmallD:
         self.delete = self.http.delete
 
         add_standard_listeners(self)
+
+    @staticmethod
+    def v6(*args, **kwargs):
+        return SmallD(base_url=V6_BASE_URL, *args, **kwargs)
+
+    @staticmethod
+    def v8(*args, **kwargs):
+        return SmallD(base_url=V8_BASE_URL, *args, **kwargs)
 
     def __getattr__(self, name):
         if name.startswith("on_"):

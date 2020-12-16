@@ -32,8 +32,8 @@ class ResourceRateLimitBucket:
         self.remaining -= 1
 
     def update(self, values):
-        self.remaining = int(values["X-RateLimit-Remaining"])
-        self.reset = int(values["X-RateLimit-Reset"])
+        self.remaining = float(values["X-RateLimit-Remaining"])
+        self.reset = float(values["X-RateLimit-Reset"])
 
 
 class GlobalRateLimitBucket:
@@ -50,7 +50,7 @@ class GlobalRateLimitBucket:
             values.get("X-RateLimit-Global", "false").lower() == "true"
         )
         if self.is_ratelimited:
-            retry_after = ceil(int(values.get("Retry-After", 0)) / 1000)
+            retry_after = ceil(float(values.get("Retry-After", 0)) / 1000)
             self.reset = time.time() + retry_after
 
 
