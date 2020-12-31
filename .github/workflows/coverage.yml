@@ -30,7 +30,7 @@ jobs:
         chmod +x ./cc-test-reporter
     - name: Test with tox
       run: |
-        pyenv local $(cat .python-version | tr '\n' ' ')
+        pyenv local 3.6.9 3.7.4 3.8.6 3.9.0
         ./cc-test-reporter before-build
         tox --skip-missing-interpreters=false
         ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
