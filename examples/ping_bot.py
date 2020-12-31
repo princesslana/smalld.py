@@ -1,6 +1,10 @@
+import logging
+
 from smalld import SmallD
 
 smalld = SmallD.v8()
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 @smalld.on_message_create
