@@ -11,7 +11,7 @@ import requests
 from .exceptions import HttpError, NetworkError, SmallDError
 from .gateway import Gateway
 from .json_elements import JsonObject
-from .logger import logger
+from .logger import logger, redact_from_logging
 from .ratelimit import RateLimiter
 from .standard_listeners import add_standard_listeners
 
@@ -97,6 +97,8 @@ class SmallD:
         self.delete = self.http.delete
 
         add_standard_listeners(self)
+
+        redact_from_logging(token)
 
     @staticmethod
     def v6(*args, **kwargs):
