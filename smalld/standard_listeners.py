@@ -113,6 +113,7 @@ class Heartbeat:
         smalld.on_gateway_payload(self.on_heartbeat, op=OP_HEARTBEAT)
         smalld.on_gateway_payload(self.on_heartbeat_ack, op=OP_HEARTBEAT_ACK)
         smalld.on_ready(self.on_heartbeat_ack)
+        smalld.on_resumed(self.on_heartbeat_ack)
 
     def on_hello(self, data):
         self.heartbeat_interval = data.d.heartbeat_interval / 1000
