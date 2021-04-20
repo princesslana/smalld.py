@@ -4,22 +4,39 @@
 #
 #    pip-compile --output-file=requirements/test.txt requirements/test.in
 #
-atomicwrites==1.4.0       # via pytest
-attrs==19.3.0             # via pytest
-certifi==2020.4.5.1       # via requests
-chardet==3.0.4            # via requests
-coverage==5.1             # via -r requirements/test.in
-idna==2.9                 # via requests
-importlib-metadata==1.6.0  # via pluggy, pytest
-more-itertools==8.3.0     # via pytest
-packaging==20.4           # via pytest
-pluggy==0.13.1            # via pytest
-py==1.8.1                 # via pytest
-pyparsing==2.4.7          # via packaging
-pytest==5.2.1             # via -r requirements/test.in
-requests==2.23.0          # via responses
-responses==0.10.14        # via -r requirements/test.in
-six==1.15.0               # via packaging, responses
-urllib3==1.25.9           # via requests
-wcwidth==0.1.9            # via pytest
-zipp==3.1.0               # via importlib-metadata
+atomicwrites==1.4.0
+    # via pytest
+attrs==19.3.0
+    # via pytest
+certifi==2020.4.5.1
+    # via requests
+chardet==3.0.4
+    # via requests
+coverage==5.1
+    # via -r test.in
+idna==2.9
+    # via requests
+more-itertools==8.3.0
+    # via pytest
+packaging==20.4
+    # via pytest
+pluggy==0.13.1
+    # via pytest
+py==1.10.0
+    # via pytest
+pyparsing==2.4.7
+    # via packaging
+pytest==5.2.1
+    # via -r test.in
+requests==2.23.0
+    # via responses
+responses==0.10.14
+    # via -r test.in
+six==1.15.0
+    # via
+    #   packaging
+    #   responses
+urllib3==1.25.9
+    # via requests
+wcwidth==0.1.9
+    # via pytest
