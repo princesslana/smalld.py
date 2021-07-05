@@ -68,13 +68,14 @@ def is_recoverable_error(reason):
 
 V6_BASE_URL = "https://discord.com/api/v6"
 V8_BASE_URL = "https://discord.com/api/v8"
+V9_BASE_URL = "https://discord.com/api/v9"
 
 
 class SmallD:
     def __init__(
         self,
         token=os.environ.get("SMALLD_TOKEN"),
-        base_url=V8_BASE_URL,
+        base_url=V9_BASE_URL,
         intents=Intent.unprivileged(),
         shard=(0, 1),
     ):
